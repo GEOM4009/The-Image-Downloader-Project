@@ -12,9 +12,61 @@ import subprocess
 from datetime import datetime
 import re
 import glob
+from owslib.wms import WebMapService
 
 
-# Place Code Here for API and image download -------------------------------------------
+# Place Code Here for API and image download (Collin) -------------------------------------------
+def wms_image(layer_name, bbox, time, output_format="image/png"):
+    """
+    Grabs an image from a Web Map Service (WMS version 1.3.0) and returns the image data as either png or jpeg.
+    An example use case can use the entire worldview boudning box of (-180, -90, 180, 90)
+    As of right now the imagery cannot be accessed in NRT, but it says on the API documentation that it is possible see: https://nasa-gibs.github.io/gibs-api-docs/access-basics/
+    To grab the wms imagery I referenced the GIBS API examples that can be found here: https://nasa-gibs.github.io/gibs-api-docs/python-usage/
+    Params:
+    - layer_name (str): The name of the satellite layer.
+    - bbox (tuple): The bounding box coordinates for the image.
+    - time (str): The time of the data in ISO8601 format (supposed to be sub-daily but will not accept it despite offering NRT imagery)
+    - output_format (str): The format of the image to save. Default is 'image/png'.
+
+    Returns:
+    - img_data: The binary image data from WMS.
+    """
+    # Connect to the GIBS WMS Service
+    wms = WebMapService(
+        "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?",
+        version="1.3.0",
+    )
+
+    # Get the image from the WMS service GIBS endpoint
+    img = wms.getmap(
+        layers=[layer_name],  # Layer name
+        srs="epsg:4326",  # Map projection
+        bbox=bbox,  # Bounding box
+        size=(1200, 600),  # Image size
+        time=time,  # Time variable
+        format=output_format,  # Image format
+        transparent=True,
+    )  # Nodata transparency
+
+    # Read the binary image data
+    img_data = img.read()
+
+    return img_data
+
+
+def save_image(img_data, output_file):
+    """
+    Saves the given image data to an output file.
+    The code was inspired by Derek's code using Rasterio to open and save the imagery. I decided to use the Python built in file handling operations
+    Such as .write to write the binary data as the rasterio expects an array.
+
+    Args:
+    - img_data: The binary image data to save grabbed from the wms function.
+    - output_file (str): The path to the output file.
+    """
+    # Save the image data to a file using Python's built in file operations
+    with open(output_file, "wb") as f:
+        f.write(img_data)
 
 
 # Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
@@ -146,14 +198,14 @@ except subprocess.CalledProcessError as e:
     print("Error running HegTool:", e)
 
 
-# Place Code here for GeoTIFF merge-------------------------------------------
+# Place Code here for GeoTIFF merge (Philip) -------------------------------------------
 
 
-
-# Place Code here for Georeferencing------------------------------------------
+# Place Code here for Georeferencing (Shea + Philip) ------------------------------------------
 
 from osgeo import gdal, ogr, osr
 import subprocess
+
 
 def getgt_proj(input_image):
     """
@@ -186,7 +238,8 @@ def getgt_proj(input_image):
 
     # Return the geotransform and projection
     return geotransform, projection
-    
+
+
 def georeference_image(input_image, output_image, geotransform, projection):
     """
     Georeferences an image using GDAL.Together these steps open an existing image file, create a georeferenced copy of it by setting its geotransformation and projection, and save it as a new GeoTIFF.
@@ -220,8 +273,9 @@ def georeference_image(input_image, output_image, geotransform, projection):
     dst = None
     src = None
     print("Georeferencing complete.")
-    
-# Place Code here for GeoTIFF to KML conversion------------------------------
+
+
+# Place Code here for GeoTIFF to KML conversion (Shea) ------------------------------
 def convert_to_kmz(input_tiff, output_kmz):
     """
     Converts a GeoTIFF image to KMZ format using GDAL.
