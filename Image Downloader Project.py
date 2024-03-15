@@ -89,9 +89,9 @@ parameter_file_path = (
 )
 input_hdf_filename = newest_hdf_filename
 output_filenames = [
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest1.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest2.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest3.tif",
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band1.tif",
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band2.tif",
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band3.tif",
 ]
 
 
