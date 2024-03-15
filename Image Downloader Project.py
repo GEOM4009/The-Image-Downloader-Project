@@ -220,7 +220,7 @@ def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
         src_files_to_mosaic.append(src)
 
     # Merge the GeoTIFFs with resampling
-    mosaic, out_transform = merge(src_files_to_mosaic, method='overwrite', resampling=resampling)
+    mosaic, out_transform = merge(src_files_to_mosaic, method='first', resampling=Resampling)
 
     # Update metadata of the merged GeoTIFF
     out_meta = src.meta.copy()
