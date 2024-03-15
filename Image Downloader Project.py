@@ -1,21 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 11 17:07:30 2024
+Created on Fri Mar 12 11:42:00 2024
 
-Command Line Converter
-
-This script sets up the proper environment variables and then runs the HegTool
-in the proper Working Directory with your Parameter File.
-
-All these 
-
-@author: zachs
+@author: Philip, Shea, Collin and Zacharie
 """
+
+# import dependencies
 
 import os
 import subprocess
 from datetime import datetime
 import re
+import glob
+
+
+# Place Code Here for API and image download -------------------------------------------
+
+
+# Place Code Here for HDF to GeoTIFF conversion--------------------------------------
+
+
+def extract_date_from_filename(filename):
+    match = re.search(r"A(\d{4})(\d{3})", filename)
+    if match:
+        year = match.group(1)
+        day_of_year = match.group(2)
+        # Convert day of year to datetime
+        hdf_date = datetime.strptime(year + day_of_year, "%Y%j")
+        return hdf_date
+    else:
+        return None
 
 
 def modify_parameter_file(
@@ -44,40 +58,43 @@ def modify_parameter_file(
         print("The parameter file has been modified")
 
 
-def extract_date_from_filename(filename):
-    match = re.search(r"A(\d{4})(\d{3})", filename)
-    if match:
-        year = match.group(1)
-        day_of_year = match.group(2)
-        # Convert day of year to datetime
-        hdf_date = datetime.strptime(year + day_of_year, "%Y%j")
-        return hdf_date
-    else:
-        return None
+# Define the directory containing HDF files
+hdf_directory = r"C:\Users\zachs\Desktop\tmp\Phillip_Data"
+
+# Use glob to find all HDF files in the directory
+hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
+
+# Sort the HDF files by modification time (newest first)
+hdf_files.sort(key=os.path.getmtime, reverse=True)
+
+if hdf_files:
+    # Get the newest HDF file (including just the filename with extension)
+    newest_hdf_filename = os.path.basename(hdf_files[0])
+    print("Newest HDF filename:", newest_hdf_filename)
+else:
+    print("No HDF files found in the directory.")
 
 
-# Assuming input filename is MOD09.A2024056.1435.061.2024058042139.hdf
-hdf_filename = r"MOD09.A2018237.0145.061.2021339074858.hdf"
-hdf_date = extract_date_from_filename(hdf_filename)
+# Set parameter file path, input and output file names
+parameter_file_path = (
+    r"C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
+)
+input_hdf_filename = newest_hdf_filename
+output_filenames = [
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest1.tif",
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest2.tif",
+    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest3.tif",
+]
+
+
+# Extract date from hdf file
+hdf_date = extract_date_from_filename(input_hdf_filename)
 
 if hdf_date:
     formatted_datetime = hdf_date.strftime("%Y-%m-%d_%H:%M")
     print("Extracted Date from HDF Filename:", formatted_datetime)
 else:
     print("Failed to extract date from HDF filename.")
-
-
-# Set parameter file path, input and output file names
-
-parameter_file_path = (
-    r"C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
-)
-input_filename = r"MOD09.A2018237.0145.061.2021339074858.hdf"
-output_filenames = [
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest1.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest2.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_cmdtest3.tif",
-]
 
 
 # Create new output filenames with datetime before "MODIS_SWATH_TYPE_L2_cmdtest3.tif"
@@ -93,7 +110,7 @@ for filename in output_filenames:
     datetime_output_filenames.append(new_filename)
 
 modify_parameter_file(
-    parameter_file_path, input_filename, datetime_output_filenames
+    parameter_file_path, input_hdf_filename, datetime_output_filenames
 )
 
 
@@ -116,3 +133,12 @@ try:
 except subprocess.CalledProcessError as e:
     # Handle error if the command fails
     print("Error running HegTool:", e)
+
+
+# Place Code here for GeoTIFF merge-------------------------------------------
+
+
+# Place Code here for GeoTIFF to KML conversion------------------------------
+
+
+# Place Code here for georeferencing------------------------------------------
