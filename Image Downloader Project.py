@@ -149,7 +149,94 @@ except subprocess.CalledProcessError as e:
 # Place Code here for GeoTIFF merge-------------------------------------------
 
 
-# Place Code here for GeoTIFF to KML conversion------------------------------
-
 
 # Place Code here for Georeferencing------------------------------------------
+
+from osgeo import gdal, ogr, osr
+import subprocess
+
+def getgt_proj(input_image):
+    """
+    Fetches the geotransform and projection of a given input image.
+
+    Parameters:
+    - input_image: Path to the input image file.
+
+    Returns:
+    A tuple containing (geotransform, projection).
+    """
+    # Open the image
+    ds = gdal.Open(input_image)
+
+    # Initialize return values
+    geotransform, projection = None, None
+
+    # Fetch geotransformation
+    geotransform = ds.GetGeoTransform()
+    if geotransform:
+        print("Geotransform:", geotransform)
+
+    # Fetch projection
+    projection = ds.GetProjection()
+    if projection:
+        print("Projection:", projection)
+
+    # Close the dataset
+    ds = None
+
+    # Return the geotransform and projection
+    return geotransform, projection
+    
+def georeference_image(input_image, output_image, geotransform, projection):
+    """
+    Georeferences an image using GDAL.Together these steps open an existing image file, create a georeferenced copy of it by setting its geotransformation and projection, and save it as a new GeoTIFF.
+
+    Parameters:
+    - input_image: Path to the input image.
+    - output_image: Path to the output georeferenced image.
+    - geotransform: Geotransform tuple for the image.
+    - projection: Projection as a WKT string.
+    """
+    # Open the input image
+    src = gdal.Open(
+        input_image, gdal.GA_ReadOnly
+    )  # The input image file is opened in read-only mode so it cannot be modified
+    driver = gdal.GetDriverByName("GTiff")  # I assume our image is a GeoTiff ?
+
+    # Create the output image that is a copy of the source image
+    dst = driver.CreateCopy(
+        output_image, src, 0
+    )  # Creates a copy (dst) of the source dataset (src). The '0' argument indicates no additional options are passed to CreatCopy
+
+    # Set the geotransformation and projection
+    dst.SetGeoTransform(
+        geotransform
+    )  # 'geotransform' specifies how pixels in the raster geographically coordinate. It contains 6 coefficients which define the transformation
+    dst.SetProjection(
+        projection
+    )  # The projection is specified as Well-Known Text (WKT)
+
+    # Close the datasets
+    dst = None
+    src = None
+    print("Georeferencing complete.")
+    
+# Place Code here for GeoTIFF to KML conversion------------------------------
+def convert_to_kmz(input_tiff, output_kmz):
+    """
+    Converts a GeoTIFF image to KMZ format using GDAL.
+
+    Parameters:
+    - input_tiff: Path to the input GeoTIFF image.
+    - output_kmz: Path to the output KMZ file.
+    """
+    # 'gdal_translate' is a GDAL utility used to convert raster data between different formats, '-of' 'KMLSUPEROVERLAY' specify the output format
+    command = [
+        "gdal_translate",
+        "-of",
+        "KMLSUPEROVERLAY",
+        input_tiff,
+        output_kmz,
+    ]
+    subprocess.run(command)
+    print("Conversion to KMZ complete.")
