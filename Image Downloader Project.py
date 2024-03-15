@@ -13,6 +13,9 @@ from datetime import datetime
 import re
 import glob
 from owslib.wms import WebMapService
+import rasterio
+from rasterio.merge import merge
+from rasterio.enums import Resampling
 
 
 # Place Code Here for API and image download (Collin) -------------------------------------------
@@ -201,6 +204,36 @@ except subprocess.CalledProcessError as e:
 
 
 # Place Code here for GeoTIFF merge (Philip) -------------------------------------------
+def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
+    """
+    Merge multiple GeoTIFF files with 3 bands (RGB) into a single GeoTIFF file.
+
+    Parameters:
+    - input_files: List of input GeoTIFF file paths
+    - output_file: Output GeoTIFF file path for the merged image
+    - resampling: Resampling method (default: nearest)
+    """
+    # Open all input GeoTIFF files
+    src_files_to_mosaic = []
+    for input_file in input_files:
+        src = rasterio.open(input_file)
+        src_files_to_mosaic.append(src)
+
+    # Merge the GeoTIFFs with resampling
+    mosaic, out_transform = merge(src_files_to_mosaic, method='overwrite', resampling=resampling)
+
+    # Update metadata of the merged GeoTIFF
+    out_meta = src.meta.copy()
+    out_meta.update({"driver": "GTiff",
+                     "height": mosaic.shape[1],
+                     "width": mosaic.shape[2],
+                     "transform": out_transform})
+
+    # Write the merged GeoTIFF to disk
+    with rasterio.open(output_file, "w", **out_meta) as dest:
+        dest.write(mosaic)
+
+    print("Merge complete. Output file:", output_file)
 
 
 # Place Code here for Georeferencing------------------------------------------
