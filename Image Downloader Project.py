@@ -76,9 +76,9 @@ hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
 hdf_files.sort(key=os.path.getmtime, reverse=True)
 
 if hdf_files:
-    # Get the newest HDF file (including just the filename with extension)
-    newest_hdf_filename = os.path.basename(hdf_files[0])
-    print("Newest HDF filename:", newest_hdf_filename)
+    # Get the newest HDF file
+    newest_hdf_file = hdf_files[0]
+    print("Newest HDF file:", newest_hdf_file)
 else:
     print("No HDF files found in the directory.")
 
@@ -87,7 +87,7 @@ else:
 parameter_file_path = (
     r"C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
 )
-input_hdf_filename = newest_hdf_filename
+input_hdf_filename = newest_hdf_file
 output_filenames = [
     r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band1.tif",
     r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band2.tif",
@@ -135,7 +135,9 @@ os.chdir(r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\bin")
 
 # Command to run HegTool with the parameter file
 # https://www.hdfeos.org/software/heg.php
-command = r"swtif -p C:\Users\zachs\Desktop\tmp\Template_swath.prm"
+command = (
+    r"swtif -p C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
+)
 
 try:
     # Execute the command
@@ -149,11 +151,11 @@ except subprocess.CalledProcessError as e:
 # Place Code here for GeoTIFF merge-------------------------------------------
 
 
-
 # Place Code here for Georeferencing------------------------------------------
 
 from osgeo import gdal, ogr, osr
 import subprocess
+
 
 def getgt_proj(input_image):
     """
@@ -186,7 +188,8 @@ def getgt_proj(input_image):
 
     # Return the geotransform and projection
     return geotransform, projection
-    
+
+
 def georeference_image(input_image, output_image, geotransform, projection):
     """
     Georeferences an image using GDAL.Together these steps open an existing image file, create a georeferenced copy of it by setting its geotransformation and projection, and save it as a new GeoTIFF.
@@ -220,7 +223,8 @@ def georeference_image(input_image, output_image, geotransform, projection):
     dst = None
     src = None
     print("Georeferencing complete.")
-    
+
+
 # Place Code here for GeoTIFF to KML conversion------------------------------
 def convert_to_kmz(input_tiff, output_kmz):
     """
