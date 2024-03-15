@@ -17,9 +17,11 @@ import glob
 # Place Code Here for API and image download -------------------------------------------
 
 
-# Place Code Here for HDF to GeoTIFF conversion--------------------------------------
+# Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
 
 
+# This section of the code was taken from and AI generated script to search the
+# hdf file for the time
 def extract_date_from_filename(filename):
     match = re.search(r"A(\d{4})(\d{3})", filename)
     if match:
@@ -32,6 +34,9 @@ def extract_date_from_filename(filename):
         return None
 
 
+# Only changing the output file sequentially was taken from AI,and
+# https://www.geeksforgeeks.org/python-program-to-replace-specific-line-in-file/
+# I used this site to get started on how to modify lines of text
 def modify_parameter_file(
     parameter_file_path, input_filename, output_filenames
 ):
@@ -65,6 +70,9 @@ hdf_directory = r"C:\Users\zachs\Desktop\tmp\Phillip_Data"
 hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
 
 # Sort the HDF files by modification time (newest first)
+# https://www.geeksforgeeks.org/get-sorted-file-names-from-a-directory-by-creation-date-in-python/
+# https://docs.python.org/3/howto/sorting.html
+# I used these to get know how to get time and sort
 hdf_files.sort(key=os.path.getmtime, reverse=True)
 
 if hdf_files:
@@ -115,6 +123,8 @@ modify_parameter_file(
 
 
 # Set environment variables
+# https://developer.vonage.com/en/blog/python-environment-variables-a-primer#how-to-set-python-environment-variables
+# Used this to find out how to set environment variable
 os.environ["MRTBINDIR"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\bin"
 os.environ["PGSHOME"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\TOOLKIT_MTD"
 os.environ["MRTDATADIR"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\data"
@@ -124,6 +134,7 @@ os.chdir(r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\bin")
 
 
 # Command to run HegTool with the parameter file
+# https://www.hdfeos.org/software/heg.php
 command = r"swtif -p C:\Users\zachs\Desktop\tmp\Template_swath.prm"
 
 try:
@@ -141,4 +152,4 @@ except subprocess.CalledProcessError as e:
 # Place Code here for GeoTIFF to KML conversion------------------------------
 
 
-# Place Code here for georeferencing------------------------------------------
+# Place Code here for Georeferencing------------------------------------------
