@@ -16,6 +16,8 @@ from owslib.wms import WebMapService
 import rasterio
 from rasterio.merge import merge
 from rasterio.enums import Resampling
+from osgeo import gdal, ogr, osr
+import subprocess
 
 
 # Place Code Here for API and image download (Collin) -------------------------------------------
@@ -220,14 +222,20 @@ def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
         src_files_to_mosaic.append(src)
 
     # Merge the GeoTIFFs with resampling
-    mosaic, out_transform = merge(src_files_to_mosaic, method='first', resampling=Resampling)
+    mosaic, out_transform = merge(
+        src_files_to_mosaic, method="first", resampling=resampling
+    )
 
     # Update metadata of the merged GeoTIFF
     out_meta = src.meta.copy()
-    out_meta.update({"driver": "GTiff",
-                     "height": mosaic.shape[1],
-                     "width": mosaic.shape[2],
-                     "transform": out_transform})
+    out_meta.update(
+        {
+            "driver": "GTiff",
+            "height": mosaic.shape[1],
+            "width": mosaic.shape[2],
+            "transform": out_transform,
+        }
+    )
 
     # Write the merged GeoTIFF to disk
     with rasterio.open(output_file, "w", **out_meta) as dest:
@@ -236,10 +244,18 @@ def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
     print("Merge complete. Output file:", output_file)
 
 
-# Place Code here for Georeferencing------------------------------------------
+input_files = [
+    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band1.tif",
+    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band2.tif",
+    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band3.tif",
+]
 
-from osgeo import gdal, ogr, osr
-import subprocess
+output_file = "MOD9_Merged_test.tif"
+
+# Use the integer value for nearest neighbor resampling (0)
+merge_geotiffs(input_files, output_file, resampling=0)
+
+# Place Code here for Georeferencing------------------------------------------
 
 
 def getgt_proj(input_image):
@@ -329,3 +345,15 @@ def convert_to_kmz(input_tiff, output_kmz):
     ]
     subprocess.run(command)
     print("Conversion to KMZ complete.")
+
+
+output_image = "MOD9_GeoReferenced.tif"
+input_image = output_file
+
+getgt_proj(output_file)
+georeference_image(input_image, output_image, geotransform, projection)
+
+
+input_tiff = output_image
+output_kmz = "MOD9_KML.kml"
+convert_to_kmz(input_tiff, output_kmz)
