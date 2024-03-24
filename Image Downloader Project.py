@@ -18,6 +18,9 @@ from rasterio.merge import merge
 from rasterio.enums import Resampling
 from osgeo import gdal, ogr, osr
 import subprocess
+import argparse
+from configparser import RawConfigParser
+import sys
 
 
 # Place Code Here for API and image download (Collin) -------------------------------------------
@@ -84,7 +87,6 @@ def extract_date_from_filename(filename):
     if match:
         year = match.group(1)
         day_of_year = match.group(2)
-        # Convert day of year to datetime
         hdf_date = datetime.strptime(year + day_of_year, "%Y%j")
         return hdf_date
     else:
@@ -97,112 +99,62 @@ def extract_date_from_filename(filename):
 def modify_parameter_file(
     parameter_file_path, input_filename, output_filenames
 ):
-    # Read the contents of the parameter file
-    with open(parameter_file_path, "r") as file:
+    with open(parameter_file_path, "r", newline="") as file:
         lines = file.readlines()
 
-    # Modify the lines containing INPUT_FILENAME
     modified_lines = []
     for line in lines:
         if line.strip().startswith("INPUT_FILENAME"):
             modified_lines.append(f"INPUT_FILENAME = {input_filename}\n")
         elif line.strip().startswith("OUTPUT_FILENAME"):
-            # Change the output filename sequentially
             modified_lines.append(
                 f"OUTPUT_FILENAME = {output_filenames.pop(0)}\n"
             )
         else:
             modified_lines.append(line)
 
-    # Write the modified contents back to the parameter file
-    with open(parameter_file_path, "w") as file:
+    with open(parameter_file_path, "w", newline="") as file:
         file.writelines(modified_lines)
         print("The parameter file has been modified")
 
 
-# Define the directory containing HDF files
-hdf_directory = r"C:\Users\zachs\Desktop\tmp\Phillip_Data"
+# I found out that the file was in Windows CR LF not in Unix LF
+# https://stackoverflow.com/questions/36422107/how-to-convert-crlf-to-lf-on-a-windows-machine-in-python
+def convert_windows_to_unix_line_endings(file_path):
+    WINDOWS_LINE_ENDING = b"\r\n"
+    UNIX_LINE_ENDING = b"\n"
 
-# Use glob to find all HDF files in the directory
-hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
+    try:
+        with open(file_path, "rb") as open_file:
+            content = open_file.read()
 
-# Sort the HDF files by modification time (newest first)
-# https://www.geeksforgeeks.org/get-sorted-file-names-from-a-directory-by-creation-date-in-python/
-# https://docs.python.org/3/howto/sorting.html
-# I used these to get know how to get time and sort
-hdf_files.sort(key=os.path.getmtime, reverse=True)
+        content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
 
-if hdf_files:
-    # Get the newest HDF file
-    newest_hdf_file = hdf_files[0]
-    print("Newest HDF file:", newest_hdf_file)
-else:
-    print("No HDF files found in the directory.")
+        with open(file_path, "wb") as open_file:
+            open_file.write(content)
 
-
-# Set parameter file path, input and output file names
-parameter_file_path = (
-    r"C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
-)
-input_hdf_filename = newest_hdf_file
-output_filenames = [
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band1.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band2.tif",
-    r"C:\Users\zachs\Desktop\tmp\MODIS_SWATH_TYPE_L2_Band3.tif",
-]
+        print(
+            f"Line endings converted from Windows (CRLF) to Unix (LF) in {file_path}"
+        )
+    except IOError:
+        print(f"Error: Unable to open or modify file {file_path}")
 
 
-# Extract date from hdf file
-hdf_date = extract_date_from_filename(input_hdf_filename)
+def add_datetime_to_filenames(
+    directory_path, base_filenames, formatted_datetime
+):
+    new_filenames = []
+    for filename in base_filenames:
+        # Split the file name and extension
+        base_name, extension = os.path.splitext(filename)
+        # Create the new filename with datetime and the original extension
+        new_filename = os.path.join(
+            directory_path,
+            f"{formatted_datetime}_MODIS_SWATH_TYPE_L2_{base_name}{extension}",
+        )
+        new_filenames.append(new_filename)
 
-if hdf_date:
-    formatted_datetime = hdf_date.strftime("%Y-%m-%d_%H:%M")
-    print("Extracted Date from HDF Filename:", formatted_datetime)
-else:
-    print("Failed to extract date from HDF filename.")
-
-
-# Create new output filenames with datetime before "MODIS_SWATH_TYPE_L2_cmdtest3.tif"
-datetime_output_filenames = []
-for filename in output_filenames:
-    # Get the directory path
-    directory_path = os.path.dirname(filename)
-    # Get the filename without extension
-    base_filename = os.path.splitext(os.path.basename(filename))[0]
-    # Create the new filename
-    new_filename = f"{directory_path}\\{formatted_datetime}_MODIS_SWATH_TYPE_L2_{base_filename.split('_')[-1]}.tif"
-    # Append new filename to the list
-    datetime_output_filenames.append(new_filename)
-
-modify_parameter_file(
-    parameter_file_path, input_hdf_filename, datetime_output_filenames
-)
-
-
-# Set environment variables
-# https://developer.vonage.com/en/blog/python-environment-variables-a-primer#how-to-set-python-environment-variables
-# Used this to find out how to set environment variable
-os.environ["MRTBINDIR"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\bin"
-os.environ["PGSHOME"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\TOOLKIT_MTD"
-os.environ["MRTDATADIR"] = r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\data"
-
-# Set the working directory
-os.chdir(r"C:\Users\zachs\Desktop\HEGTool\HEG_Win\bin")
-
-
-# Command to run HegTool with the parameter file
-# https://www.hdfeos.org/software/heg.php
-command = (
-    r"swtif -p C:\Users\zachs\Desktop\tmp\Phillip_Data\image_project_swath.prm"
-)
-
-try:
-    # Execute the command
-    subprocess.run(command, check=True)
-    print("HegTool executed successfully.")
-except subprocess.CalledProcessError as e:
-    # Handle error if the command fails
-    print("Error running HegTool:", e)
+    return new_filenames
 
 
 # Place Code here for GeoTIFF merge (Philip) -------------------------------------------
@@ -243,17 +195,6 @@ def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
 
     print("Merge complete. Output file:", output_file)
 
-
-input_files = [
-    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band1.tif",
-    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band2.tif",
-    "MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band3.tif",
-]
-
-output_file = "MOD9_Merged_test.tif"
-
-# Use the integer value for nearest neighbor resampling (0)
-merge_geotiffs(input_files, output_file, resampling=0)
 
 # Place Code here for Georeferencing------------------------------------------
 
@@ -347,13 +288,190 @@ def convert_to_kmz(input_tiff, output_kmz):
     print("Conversion to KMZ complete.")
 
 
-output_image = "MOD9_GeoReferenced.tif"
-input_image = output_file
-
-getgt_proj(output_file)
-georeference_image(input_image, output_image, geotransform, projection)
+# Place Code to Read from config file (Zacharie) -------------------------------------------------
 
 
-input_tiff = output_image
-output_kmz = "MOD9_KML.kml"
-convert_to_kmz(input_tiff, output_kmz)
+def getargs():
+    """
+    Get command line arguments.
+
+    Returns
+    -------
+    cfg_path : str
+        path to config file
+
+    """
+
+    parser = argparse.ArgumentParser(description="Process a file path.")
+
+    # add an argument for configfile
+    parser.add_argument(
+        "configfile",
+        type=str,
+        help="enter the full path and name of your config file",
+    )
+    # now make a list of all the arguments
+    args = parser.parse_args()
+    cfg_path = args.configfile
+    return cfg_path
+
+
+def getconfig(cfg_path):
+
+    cfg = os.path.expanduser(cfg_path)
+    config = RawConfigParser()  # run the parser
+
+    try:
+        config.read(cfg)  # read file
+        # now get the variables stored in the config file
+        # there are 3 categories - names, logging, and settings
+
+        parameter_file_path = config.get("Paths", "parameter_file_path")
+        directory_path = config.get("Paths", "directory_path")
+        hdf_directory = config.get("Paths", "hdf_directory")
+
+        base_filenames = config.get("Names", "base_filenames")
+        working_directory = config.get("HegTool", "working_directory")
+        MRTBINDIR = config.get("HegTool", "MRTBINDIR")
+        PGSHOME = config.get("HegTool", "PGSHOME")
+        MRTDATADIR = config.get("HegTool", "MRTDATADIR")
+
+    except:
+        print(
+            "Trouble reading config file, please check the file and path are valid\n"
+        )
+        sys.exit(1)
+
+    return (
+        parameter_file_path,
+        directory_path,
+        hdf_directory,
+        base_filenames,
+        working_directory,
+        MRTBINDIR,
+        PGSHOME,
+        MRTDATADIR,
+    )
+
+
+def main():
+    """Run script - main function."""
+
+    # get the config file name
+    configfile = getargs()
+    # read in the config info
+    (
+        parameter_file_path,
+        directory_path,
+        hdf_directory,
+        base_filenames,
+        working_directory,
+        MRTBINDIR,
+        PGSHOME,
+        MRTDATADIR,
+    ) = getconfig(configfile)
+
+    # Split the string using a space delimiter (you can change this based on the actual delimiter)
+    try:
+        # need to parse out the names of the contestants
+        # first put each line in a list and remove spaces
+        base_filenames = [x.strip() for x in base_filenames.splitlines()]
+        # then remove empty rows
+        base_filenames = [
+            base_filenames
+            for base_filenames in base_filenames
+            if base_filenames
+        ]
+
+        print(base_filenames)
+    except:
+        print("There was an error in splitting the base file names")
+
+    # Use glob to find all HDF files in the directory
+    hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
+
+    # Sort the HDF files by modification time (newest first)
+    hdf_files.sort(key=os.path.getmtime, reverse=True)
+    # Grab the newest HDF file
+    if hdf_files:
+        newest_hdf_file = hdf_files[0]
+        print("Newest HDF file:", newest_hdf_file)
+    else:
+        print("No HDF files found in the directory.")
+
+    input_hdf_filename = newest_hdf_file
+
+    # Extract date from hdf file
+    hdf_date = extract_date_from_filename(input_hdf_filename)
+
+    if hdf_date:
+        formatted_datetime = hdf_date.strftime("%Y-%m-%d_%H.%M")
+        print("Extracted Date from HDF Filename:", formatted_datetime)
+    else:
+        print("Failed to extract date from HDF filename.")
+
+    new_date_output_filenames = add_datetime_to_filenames(
+        directory_path, base_filenames, formatted_datetime
+    )
+
+    # Split the path from the file name for each file in new_date_output_filenames
+    file_names_only = [
+        os.path.split(file_path)[1] for file_path in new_date_output_filenames
+    ]
+
+    modify_parameter_file(
+        parameter_file_path, input_hdf_filename, new_date_output_filenames
+    )
+    convert_windows_to_unix_line_endings(parameter_file_path)
+
+    # Set environment variables
+    os.environ["MRTBINDIR"] = MRTBINDIR
+    os.environ["PGSHOME"] = PGSHOME
+    os.environ["MRTDATADIR"] = MRTDATADIR
+
+    # Set the working directory
+    os.chdir(working_directory)
+
+    # Command to run HegTool with the parameter file
+    # https://www.hdfeos.org/software/heg.php
+
+    command = [
+        "swtif",
+        "-p",
+        parameter_file_path,
+    ]
+
+    try:
+        # Execute the command
+        subprocess.run(command, check=True)
+        print("HegTool executed successfully.")
+    except subprocess.CalledProcessError as e:
+        # Handle error if the command fails
+        print("Error running HegTool:", e)
+
+    os.chdir(directory_path)
+
+    input_GeoTIFF_files = [
+        file_names_only[0],
+        file_names_only[1],
+        file_names_only[2],
+    ]
+
+    output_GeoTIFF_combined = "MOD9_Merged_test.tif"
+
+    # Use the integer value for nearest neighbor resampling (0)
+    merge_geotiffs(input_GeoTIFF_files, output_GeoTIFF_combined, resampling=0)
+
+    output_image = "MOD9_GeoReferenced.tif"
+    input_image = output_GeoTIFF_combined
+
+    geotransform, projection = getgt_proj(output_GeoTIFF_combined)
+    georeference_image(input_image, output_image, geotransform, projection)
+
+    input_tiff = output_image
+    output_kmz = "MOD9_KML.kml"
+    convert_to_kmz(input_tiff, output_kmz)
+
+
+if __name__ == "__main__":
+    main()
