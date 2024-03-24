@@ -16,8 +16,7 @@ from owslib.wms import WebMapService
 import rasterio
 from rasterio.merge import merge
 from rasterio.enums import Resampling
-from osgeo import gdal, ogr, osr
-import subprocess
+from osgeo import gdal
 import argparse
 from configparser import RawConfigParser
 import sys
