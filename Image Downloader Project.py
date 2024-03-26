@@ -25,7 +25,7 @@ from shapely.geometry import Polygon
 
 
 # New API download from LANCE NRT with token access (Zacharie)
-def download_hdf_file(url, auth_token, download_dir):
+def download_lance_file(url, auth_token, download_dir):
     """
     Download an HDF file using wget command.
 
@@ -61,7 +61,7 @@ def download_hdf_file(url, auth_token, download_dir):
 
 
 # Text file processing function--------- (Collin)
-def process_text_file(file_path, xmin1, ymax1, xmax1, ymin1):
+def extract_granule(txt_file, xmin1, ymax1, xmax1, ymin1):
     """
     This function takes the input text file and bounding box coordinates.
     It loads in each GranuleID and corresponding attributes and takes the bounding coordinates as geometry (polygons)
@@ -75,7 +75,7 @@ def process_text_file(file_path, xmin1, ymax1, xmax1, ymin1):
         selected_granuleID (str): A string containing the GranuleID for the hdf download request.
     """
     # Read the text file into a DataFrame skipping the first two rows
-    df_txt = pd.read_csv(file_path, skiprows=2)
+    df_txt = pd.read_csv(txt_file, skiprows=2)
 
     # Convert bounding coordinates to Polygon geometries
     geometry = [
@@ -97,6 +97,11 @@ def process_text_file(file_path, xmin1, ymax1, xmax1, ymin1):
     bb = Polygon(
         [(xmin1, ymax1), (xmax1, ymax1), (xmax1, ymin1), (xmin1, ymin1)]
     )
+
+    # To visualize the bounding box uncomment the code below
+    # Create a GeoDataFrame with the AOI polygon
+    # gdf_aoi = gpd.GeoDataFrame(geometry=[bb], crs='EPSG:4326')
+    # gdf_aoi.to_file("C:\\Users\\colli\\GEOM4009\\Group\\Test123.gpkg", driver='GPKG')
 
     # Filter based on the bounding box
     selected_granules = gdf[gdf.intersects(bb)]
@@ -436,15 +441,30 @@ def main():
         download_HDF_directory,
     ) = getconfig(configfile)
 
+<<<<<<< HEAD
+=======
+    # Get the date from today in UTC time
+    t = datetime.utcnow()
+    url_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
+    url_year = datetime.strftime(t, "%Y/")
+    url_full = (
+        '"'
+        + "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/"
+        + url_year
+        + url_file_name
+        + '"'
+    )
     # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
-    filename = "test.txt"
-    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
-    extract_granule_data(filename)
 
+    download_lance_file(url_full, auth_token, download_HDF_directory)
+
+    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
+
+>>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
     # We need to create a function that takes our basic repository url and add the correct HDF file
     hdf_url = "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/2024/MYD03.A2024085.1650.061.2024085172648.NRT.hdf"
     # This is what needs to run in the command line to download HDF data.
-    download_hdf_file(hdf_url, auth_token, download_HDF_directory)
+    download_lance_file(hdf_url, auth_token, download_HDF_directory)
     # Split the string using a space delimiter (you can change this based on the actual delimiter)
     try:
         # need to parse out the names of the contestants
@@ -460,6 +480,13 @@ def main():
         print(base_filenames)
     except:
         print("There was an error in splitting the base file names")
+
+    # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
+    text_file = "test.txt"
+    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
+    xmin1, ymax1 = -130.319077, 86.852013
+    xmax1, ymin1 = -11.317958, 61.715614
+    extract_granule(text_file, xmin1, ymax1, xmax1, ymin1)
 
     input_hdf_filename = get_newest_hdf_file(hdf_directory)
 
