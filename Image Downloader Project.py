@@ -12,7 +12,6 @@ import subprocess
 from datetime import datetime
 import re
 import glob
-from owslib.wms import WebMapService
 import rasterio
 from rasterio.merge import merge
 from rasterio.enums import Resampling
@@ -59,6 +58,53 @@ def download_hdf_file(url, auth_token, download_dir):
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
         print("Error downloading HDF file:", e)
+
+
+def extract_granule_data(filename):
+    granule_data = {}  # Initialize empty dictionary to store data
+
+    with open(filename, "r") as file:
+        next(file)  # Skip header lines
+
+        for line in file:
+            elements = line.strip().split(",")  # Split line into elements
+
+            granule_id = elements[0]
+            start_datetime = elements[1]
+            east_coord = float(elements[5])
+            north_coord = float(elements[6])
+            south_coord = float(elements[7])
+            west_coord = float(elements[8])
+
+            # Check if GranuleID already exists in the dictionary
+            if granule_id in granule_data:
+                # Append data to existing lists
+                granule_data[granule_id]["StartDateTime"].append(
+                    start_datetime
+                )
+                granule_data[granule_id]["EastBoundingCoord"].append(
+                    east_coord
+                )
+                granule_data[granule_id]["NorthBoundingCoord"].append(
+                    north_coord
+                )
+                granule_data[granule_id]["SouthBoundingCoord"].append(
+                    south_coord
+                )
+                granule_data[granule_id]["WestBoundingCoord"].append(
+                    west_coord
+                )
+            else:
+                # Create new lists for the GranuleID
+                granule_data[granule_id] = {
+                    "StartDateTime": [start_datetime],
+                    "EastBoundingCoord": [east_coord],
+                    "NorthBoundingCoord": [north_coord],
+                    "SouthBoundingCoord": [south_coord],
+                    "WestBoundingCoord": [west_coord],
+                }
+
+    return granule_data  # Return the extracted data
 
 
 # Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
@@ -386,6 +432,11 @@ def main():
         auth_token,
         download_HDF_directory,
     ) = getconfig(configfile)
+
+    # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
+    filename = "test.txt"
+    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
+    extract_granule_data(filename)
 
     # We need to create a function that takes our basic repository url and add the correct HDF file
     hdf_url = "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/2024/MYD03.A2024085.1650.061.2024085172648.NRT.hdf"
