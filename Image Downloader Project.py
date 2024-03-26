@@ -25,7 +25,7 @@ import sys
 
 
 # New API download from LANCE NRT with token access (Zacharie)
-def download_hdf_file(url, auth_token, download_dir):
+def download_lance_file(url, auth_token, download_dir):
     """
     Download an HDF file using wget command.
 
@@ -433,15 +433,27 @@ def main():
         download_HDF_directory,
     ) = getconfig(configfile)
 
+    # Get the date from today in UTC time
+    t = datetime.utcnow()
+    url_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
+    url_year = datetime.strftime(t, "%Y/")
+    url_full = (
+        '"'
+        + "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/"
+        + url_year
+        + url_file_name
+        + '"'
+    )
     # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
-    filename = "test.txt"
+
+    download_lance_file(url_full, auth_token, download_HDF_directory)
+
     # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
-    extract_granule_data(filename)
 
     # We need to create a function that takes our basic repository url and add the correct HDF file
     hdf_url = "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/2024/MYD03.A2024085.1650.061.2024085172648.NRT.hdf"
     # This is what needs to run in the command line to download HDF data.
-    download_hdf_file(hdf_url, auth_token, download_HDF_directory)
+    download_lance_file(hdf_url, auth_token, download_HDF_directory)
     # Split the string using a space delimiter (you can change this based on the actual delimiter)
     try:
         # need to parse out the names of the contestants
