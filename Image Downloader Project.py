@@ -23,57 +23,42 @@ import sys
 
 
 # Place Code Here for API and image download (Collin) -------------------------------------------
-def wms_image(layer_name, bbox, time, output_format="image/png"):
+
+
+# New API download from LANCE NRT with token access (Zacharie)
+def download_hdf_file(url, auth_token, download_dir):
     """
-    Grabs an image from a Web Map Service (WMS version 1.3.0) and returns the image data as either png or jpeg.
-    An example use case can use the entire worldview boudning box of (-180, -90, 180, 90)
-    As of right now the imagery cannot be accessed in NRT, but it says on the API documentation that it is possible see: https://nasa-gibs.github.io/gibs-api-docs/access-basics/
-    To grab the wms imagery I referenced the GIBS API examples that can be found here: https://nasa-gibs.github.io/gibs-api-docs/python-usage/
-    Params:
-    - layer_name (str): The name of the satellite layer.
-    - bbox (tuple): The bounding box coordinates for the image.
-    - time (str): The time of the data in ISO8601 format (supposed to be sub-daily but will not accept it despite offering NRT imagery)
-    - output_format (str): The format of the image to save. Default is 'image/png'.
+    Download an HDF file using wget command.
 
-    Returns:
-    - img_data: The binary image data from WMS.
+    Parameters:
+    - url (str): URL of the HDF file to download.
+    - auth_token (str): Authorization token for the request.
+    - download_dir (str): Directory where the HDF file will be saved.
     """
-    # Connect to the GIBS WMS Service
-    wms = WebMapService(
-        "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?",
-        version="1.3.0",
-    )
+    command = [
+        "wget",
+        "-e",
+        "robots=off",
+        "-m",
+        "-np",
+        "-R",
+        ".html,.tmp",
+        "-nH",
+        "--cut-dirs=4",
+        url,
+        "--header",
+        f"Authorization: Bearer {auth_token}",
+        "-P",
+        download_dir,
+    ]
 
-    # Get the image from the WMS service GIBS endpoint
-    img = wms.getmap(
-        layers=[layer_name],  # Layer name
-        srs="epsg:4326",  # Map projection
-        bbox=bbox,  # Bounding box
-        size=(1200, 600),  # Image size
-        time=time,  # Time variable
-        format=output_format,  # Image format
-        transparent=True,
-    )  # Nodata transparency
-
-    # Read the binary image data
-    img_data = img.read()
-
-    return img_data
-
-
-def save_image(img_data, output_file):
-    """
-    Saves the given image data to an output file.
-    The code was inspired by Derek's code using Rasterio to open and save the imagery. I decided to use the Python built in file handling operations
-    Such as .write to write the binary data as the rasterio expects an array.
-
-    Args:
-    - img_data: The binary image data to save grabbed from the wms function.
-    - output_file (str): The path to the output file.
-    """
-    # Save the image data to a file using Python's built in file operations
-    with open(output_file, "wb") as f:
-        f.write(img_data)
+    try:
+        # Execute the wget command
+        subprocess.run(command, check=True)
+        print("HDF file downloaded successfully.")
+    except subprocess.CalledProcessError as e:
+        # Handle error if the command fails
+        print("Error downloading HDF file:", e)
 
 
 # Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
@@ -137,6 +122,32 @@ def convert_windows_to_unix_line_endings(file_path):
         )
     except IOError:
         print(f"Error: Unable to open or modify file {file_path}")
+
+
+def get_newest_hdf_file(hdf_directory):
+    """
+    Find the newest HDF file in the specified directory.
+
+    Parameters:
+    - hdf_directory (str): Path to the directory containing HDF files.
+
+    Returns:
+    - input_hdf_filename (str): Filename of the newest HDF file, or None if no HDF files are found.
+    """
+    # Use glob to find all HDF files in the directory
+    hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
+
+    # Sort the HDF files by modification time (newest first)
+    hdf_files.sort(key=os.path.getmtime, reverse=True)
+
+    # Grab the newest HDF file if it exists
+    if hdf_files:
+        newest_hdf_file = hdf_files[0]
+        print("Newest HDF file:", newest_hdf_file)
+        return newest_hdf_file
+    else:
+        print("No HDF files found in the directory.")
+        return None
 
 
 def add_datetime_to_filenames(
@@ -334,6 +345,8 @@ def getconfig(cfg_path):
         MRTBINDIR = config.get("HegTool", "MRTBINDIR")
         PGSHOME = config.get("HegTool", "PGSHOME")
         MRTDATADIR = config.get("HegTool", "MRTDATADIR")
+        auth_token = config.get("LANCE", "auth_token")
+        download_HDF_directory = config.get("LANCE", "download_HDF_directory")
 
     except:
         print(
@@ -350,6 +363,8 @@ def getconfig(cfg_path):
         MRTBINDIR,
         PGSHOME,
         MRTDATADIR,
+        auth_token,
+        download_HDF_directory,
     )
 
 
@@ -368,8 +383,14 @@ def main():
         MRTBINDIR,
         PGSHOME,
         MRTDATADIR,
+        auth_token,
+        download_HDF_directory,
     ) = getconfig(configfile)
 
+    # We need to create a function that takes our basic repository url and add the correct HDF file
+    hdf_url = "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/2024/MYD03.A2024085.1650.061.2024085172648.NRT.hdf"
+    # This is what needs to run in the command line to download HDF data.
+    download_hdf_file(hdf_url, auth_token, download_HDF_directory)
     # Split the string using a space delimiter (you can change this based on the actual delimiter)
     try:
         # need to parse out the names of the contestants
@@ -386,19 +407,7 @@ def main():
     except:
         print("There was an error in splitting the base file names")
 
-    # Use glob to find all HDF files in the directory
-    hdf_files = glob.glob(os.path.join(hdf_directory, "*.hdf"))
-
-    # Sort the HDF files by modification time (newest first)
-    hdf_files.sort(key=os.path.getmtime, reverse=True)
-    # Grab the newest HDF file
-    if hdf_files:
-        newest_hdf_file = hdf_files[0]
-        print("Newest HDF file:", newest_hdf_file)
-    else:
-        print("No HDF files found in the directory.")
-
-    input_hdf_filename = newest_hdf_file
+    input_hdf_filename = get_newest_hdf_file(hdf_directory)
 
     # Extract date from hdf file
     hdf_date = extract_date_from_filename(input_hdf_filename)
