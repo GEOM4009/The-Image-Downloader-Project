@@ -442,7 +442,10 @@ def main():
     ) = getconfig(configfile)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
     # Get the date from today in UTC time
     t = datetime.utcnow()
     url_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
@@ -455,6 +458,13 @@ def main():
         + '"'
     )
     # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
+<<<<<<< HEAD
+=======
+
+    download_lance_file(url_full, auth_token, download_HDF_directory)
+
+    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
+>>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
 
     download_lance_file(url_full, auth_token, download_HDF_directory)
 
