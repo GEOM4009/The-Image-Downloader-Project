@@ -19,9 +19,9 @@ from osgeo import gdal
 import argparse
 from configparser import RawConfigParser
 import sys
-
-
-# Place Code Here for API and image download (Collin) -------------------------------------------
+import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Polygon
 
 
 # New API download from LANCE NRT with token access (Zacharie)
@@ -60,51 +60,54 @@ def download_lance_file(url, auth_token, download_dir):
         print("Error downloading HDF file:", e)
 
 
-def extract_granule_data(filename):
-    granule_data = {}  # Initialize empty dictionary to store data
+# Text file processing function--------- (Collin)
+def process_text_file(file_path, xmin1, ymax1, xmax1, ymin1):
+    """
+    This function takes the input text file and bounding box coordinates.
+    It loads in each GranuleID and corresponding attributes and takes the bounding coordinates as geometry (polygons)
+    The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned
 
-    with open(filename, "r") as file:
-        next(file)  # Skip header lines
+    Parameters:
+        file_path (str): The path to the txt file directory
+        xmin1, ymax1, xmax1, ymin1 (float): The bounding box coordinates
 
-        for line in file:
-            elements = line.strip().split(",")  # Split line into elements
+    Returns:
+        selected_granuleID (str): A string containing the GranuleID for the hdf download request.
+    """
+    # Read the text file into a DataFrame skipping the first two rows
+    df_txt = pd.read_csv(file_path, skiprows=2)
 
-            granule_id = elements[0]
-            start_datetime = elements[1]
-            east_coord = float(elements[5])
-            north_coord = float(elements[6])
-            south_coord = float(elements[7])
-            west_coord = float(elements[8])
+    # Convert bounding coordinates to Polygon geometries
+    geometry = [
+        Polygon(
+            [
+                (row["WestBoundingCoord"], row["SouthBoundingCoord"]),
+                (row["EastBoundingCoord"], row["SouthBoundingCoord"]),
+                (row["EastBoundingCoord"], row["NorthBoundingCoord"]),
+                (row["WestBoundingCoord"], row["NorthBoundingCoord"]),
+            ]
+        )
+        for index, row in df_txt.iterrows()
+    ]
 
-            # Check if GranuleID already exists in the dictionary
-            if granule_id in granule_data:
-                # Append data to existing lists
-                granule_data[granule_id]["StartDateTime"].append(
-                    start_datetime
-                )
-                granule_data[granule_id]["EastBoundingCoord"].append(
-                    east_coord
-                )
-                granule_data[granule_id]["NorthBoundingCoord"].append(
-                    north_coord
-                )
-                granule_data[granule_id]["SouthBoundingCoord"].append(
-                    south_coord
-                )
-                granule_data[granule_id]["WestBoundingCoord"].append(
-                    west_coord
-                )
-            else:
-                # Create new lists for the GranuleID
-                granule_data[granule_id] = {
-                    "StartDateTime": [start_datetime],
-                    "EastBoundingCoord": [east_coord],
-                    "NorthBoundingCoord": [north_coord],
-                    "SouthBoundingCoord": [south_coord],
-                    "WestBoundingCoord": [west_coord],
-                }
+    # Create a GeoDataFrame to house the entries
+    gdf = gpd.GeoDataFrame(df_txt, geometry=geometry)
 
-    return granule_data  # Return the extracted data
+    # Define the boudning box aoi
+    bb = Polygon(
+        [(xmin1, ymax1), (xmax1, ymax1), (xmax1, ymin1), (xmin1, ymin1)]
+    )
+
+    # Filter based on the bounding box
+    selected_granules = gdf[gdf.intersects(bb)]
+
+    # Select the last entry for most recent imagery
+    selected_granuleID = selected_granules["# GranuleID"].iloc[-1]
+
+    # Ensures data is returned as a string
+    selected_granuleID = str(selected_granuleID)
+
+    return selected_granuleID
 
 
 # Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
