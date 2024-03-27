@@ -154,7 +154,11 @@ def extract_date_from_filename(filename):
 # https://www.geeksforgeeks.org/python-program-to-replace-specific-line-in-file/
 # I used this site to get started on how to modify lines of text
 def modify_parameter_file(
-    parameter_file_path, input_filename, output_filenames
+    parameter_file_path,
+    input_filename,
+    output_filenames,
+    ul_corner_coordinates,
+    lr_corner_coordinates,
 ):
     with open(parameter_file_path, "r", newline="") as file:
         lines = file.readlines()
@@ -166,6 +170,14 @@ def modify_parameter_file(
         elif line.strip().startswith("OUTPUT_FILENAME"):
             modified_lines.append(
                 f"OUTPUT_FILENAME = {output_filenames.pop(0)}\n"
+            )
+        elif line.strip().startswith("SPATIAL_SUBSET_UL_CORNER"):
+            modified_lines.append(
+                f"SPATIAL_SUBSET_UL_CORNER = {ul_corner_coordinates}\n"
+            )
+        elif line.strip().startswith("SPATIAL_SUBSET_LR_CORNER"):
+            modified_lines.append(
+                f"SPATIAL_SUBSET_LR_CORNER = {lr_corner_coordinates}\n"
             )
         else:
             modified_lines.append(line)
@@ -421,10 +433,10 @@ def getconfig(cfg_path):
         auth_token = config.get("LANCE", "auth_token")
         download_HDF_directory = config.get("LANCE", "download_HDF_directory")
         download_txt_directory = config.get("LANCE", "download_txt_directory")
-        xmin1 = config.get("BoundingBox", "xmin1")
-        ymin1 = config.get("BoundingBox", "ymin1")
-        ymax1 = config.get("BoundingBox", "ymax1")
-        xmax1 = config.get("BoundingBox", "xmax1")
+        xmin = config.get("BoundingBox", "xmin")
+        ymin = config.get("BoundingBox", "ymin")
+        ymax = config.get("BoundingBox", "ymax")
+        xmax = config.get("BoundingBox", "xmax")
         base_txt_url = config.get("LANCE", "base_txt_url")
         base_HDF_url = config.get("LANCE", "base_HDF_url")
 
@@ -446,10 +458,10 @@ def getconfig(cfg_path):
         auth_token,
         download_HDF_directory,
         download_txt_directory,
-        xmin1,
-        ymin1,
-        ymax1,
-        xmax1,
+        xmin,
+        ymin,
+        ymax,
+        xmax,
         base_txt_url,
         base_HDF_url,
     )
@@ -473,10 +485,10 @@ def main():
         auth_token,
         download_HDF_directory,
         download_txt_directory,
-        xmin1,
-        ymin1,
-        ymax1,
-        xmax1,
+        xmin,
+        ymin,
+        ymax,
+        xmax,
         base_txt_url,
         base_HDF_url,
     ) = getconfig(configfile)
@@ -506,10 +518,16 @@ def main():
     # Download the txt file for that day
     download_txt_file(txt_url_full, auth_token, download_txt_directory)
 
+    hdf_year = datetime.strftime(t, "%Y/0")
+    day_of_year = str(t.timetuple().tm_yday)
+
     # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
     hdf_url_full = (
         '"'
         + base_HDF_url
+        + hdf_year
+        + day_of_year
+        + "/"
         + extract_granule(txt_url_full, xmin1, ymax1, xmax1, ymin1)
         + '"'
     )
@@ -538,9 +556,17 @@ def main():
         os.path.split(file_path)[1] for file_path in new_date_output_filenames
     ]
 
+    # Take the 4 corners coordinates and place them in UL corner and LR corner format
+    ul_corner_coordinates = "( " + ymax + " " + ymax + " )"
+    lr_corner_coordinates = "( " + xmax + " " + ymin + " )"
+
     # This section modifies the parameter file for the HEGTool to run
     modify_parameter_file(
-        parameter_file_path, input_hdf_filename, new_date_output_filenames
+        parameter_file_path,
+        input_hdf_filename,
+        new_date_output_filenames,
+        ul_corner_coordinates,
+        lr_corner_coordinates,
     )
     # This makes sure that the file is still in the correct Unix LF format
     convert_windows_to_unix_line_endings(parameter_file_path)
