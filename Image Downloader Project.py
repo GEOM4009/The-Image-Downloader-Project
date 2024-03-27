@@ -25,7 +25,7 @@ from shapely.geometry import Polygon
 
 
 # New API download from LANCE NRT with token access (Zacharie)
-def download_lance_file(url, auth_token, download_dir):
+def download_HDF_file(url, auth_token, download_HDF_dir):
     """
     Download an HDF file using wget command.
 
@@ -36,19 +36,38 @@ def download_lance_file(url, auth_token, download_dir):
     """
     command = [
         "wget",
-        "-e",
-        "robots=off",
-        "-m",
-        "-np",
-        "-R",
-        ".html,.tmp",
-        "-nH",
-        "--cut-dirs=4",
         url,
         "--header",
         f"Authorization: Bearer {auth_token}",
         "-P",
-        download_dir,
+        download_HDF_dir,
+    ]
+
+    try:
+        # Execute the wget command
+        subprocess.run(command, check=True)
+        print("HDF file downloaded successfully.")
+    except subprocess.CalledProcessError as e:
+        # Handle error if the command fails
+        print("Error downloading HDF file:", e)
+
+
+def download_txt_file(url, auth_token, download_txt_dir):
+    """
+    Download an txt file using wget command.
+
+    Parameters:
+    - url (str): URL of the HDF file to download.
+    - auth_token (str): Authorization token for the request.
+    - download_dir (str): Directory where the HDF file will be saved.
+    """
+    command = [
+        "wget",
+        url,
+        "--header",
+        f"Authorization: Bearer {auth_token}",
+        "-O",
+        download_txt_dir,
     ]
 
     try:
@@ -401,6 +420,13 @@ def getconfig(cfg_path):
         MRTDATADIR = config.get("HegTool", "MRTDATADIR")
         auth_token = config.get("LANCE", "auth_token")
         download_HDF_directory = config.get("LANCE", "download_HDF_directory")
+        download_txt_directory = config.get("LANCE", "download_txt_directory")
+        xmin1 = config.get("BoundingBox", "xmin1")
+        ymin1 = config.get("BoundingBox", "ymin1")
+        ymax1 = config.get("BoundingBox", "ymax1")
+        xmax1 = config.get("BoundingBox", "xmax1")
+        base_txt_url = config.get("LANCE", "base_txt_url")
+        base_HDF_url = config.get("LANCE", "base_HDF_url")
 
     except:
         print(
@@ -419,6 +445,13 @@ def getconfig(cfg_path):
         MRTDATADIR,
         auth_token,
         download_HDF_directory,
+        download_txt_directory,
+        xmin1,
+        ymin1,
+        ymax1,
+        xmax1,
+        base_txt_url,
+        base_HDF_url,
     )
 
 
@@ -439,42 +472,15 @@ def main():
         MRTDATADIR,
         auth_token,
         download_HDF_directory,
+        download_txt_directory,
+        xmin1,
+        ymin1,
+        ymax1,
+        xmax1,
+        base_txt_url,
+        base_HDF_url,
     ) = getconfig(configfile)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
-    # Get the date from today in UTC time
-    t = datetime.utcnow()
-    url_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
-    url_year = datetime.strftime(t, "%Y/")
-    url_full = (
-        '"'
-        + "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/"
-        + url_year
-        + url_file_name
-        + '"'
-    )
-    # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
-<<<<<<< HEAD
-=======
-
-    download_lance_file(url_full, auth_token, download_HDF_directory)
-
-    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
->>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
-
-    download_lance_file(url_full, auth_token, download_HDF_directory)
-
-    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
-
->>>>>>> af1e4dc20820cee8aedb849ad395692c176470ff
-    # We need to create a function that takes our basic repository url and add the correct HDF file
-    hdf_url = "https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/archive/geoMetaMODIS/61/AQUA/2024/MYD03.A2024085.1650.061.2024085172648.NRT.hdf"
-    # This is what needs to run in the command line to download HDF data.
-    download_lance_file(hdf_url, auth_token, download_HDF_directory)
     # Split the string using a space delimiter (you can change this based on the actual delimiter)
     try:
         # need to parse out the names of the contestants
@@ -491,13 +497,27 @@ def main():
     except:
         print("There was an error in splitting the base file names")
 
-    # Start Looking through the txt file to see if there is a new HDF file with the correct AOI
-    text_file = "test.txt"
-    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
-    xmin1, ymax1 = -130.319077, 86.852013
-    xmax1, ymin1 = -11.317958, 61.715614
-    extract_granule(text_file, xmin1, ymax1, xmax1, ymin1)
+    # Get the date from today in UTC time to build the correct url for txt download
+    t = datetime.utcnow()
+    txt_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
+    url_year = datetime.strftime(t, "%Y/")
+    txt_url_full = '"' + base_txt_url + url_year + txt_file_name + '"'
 
+    # Download the txt file for that day
+    download_txt_file(txt_url_full, auth_token, download_txt_directory)
+
+    # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
+    hdf_url_full = (
+        '"'
+        + base_HDF_url
+        + extract_granule(txt_url_full, xmin1, ymax1, xmax1, ymin1)
+        + '"'
+    )
+
+    # This line downloads the hdf file with the full url with new hdf file name
+    download_HDF_file(hdf_url_full, auth_token, download_HDF_directory)
+
+    # This line takes the newest file in the hdf directory
     input_hdf_filename = get_newest_hdf_file(hdf_directory)
 
     # Extract date from hdf file
@@ -513,14 +533,16 @@ def main():
         directory_path, base_filenames, formatted_datetime
     )
 
-    # Split the path from the file name for each file in new_date_output_filenames
+    # Split the path from the file name for each file in new_date_output_filenames for later geotiff merge
     file_names_only = [
         os.path.split(file_path)[1] for file_path in new_date_output_filenames
     ]
 
+    # This section modifies the parameter file for the HEGTool to run
     modify_parameter_file(
         parameter_file_path, input_hdf_filename, new_date_output_filenames
     )
+    # This makes sure that the file is still in the correct Unix LF format
     convert_windows_to_unix_line_endings(parameter_file_path)
 
     # Set environment variables
