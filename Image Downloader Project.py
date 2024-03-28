@@ -253,7 +253,7 @@ def add_datetime_to_filenames(
 
 
 # Place Code here for GeoTIFF merge (Philip) -------------------------------------------
-# Resources used: Code snippet provided by Derek, AI and https://rasterio.readthedocs.io/en/stable/topics/color.html 
+# Resources used: Code snippet provided by Derek, AI and https://rasterio.readthedocs.io/en/stable/topics/color.html
 def merge_raster(band1_path, band2_path, band3_path, output_path):
     """
     Create an RGB image from three grayscale GeoTIFF bands.
@@ -265,9 +265,9 @@ def merge_raster(band1_path, band2_path, band3_path, output_path):
         output_path (str): Path to the output RGB GeoTIFF file.
     """
     # Open grayscale GeoTIFF files
-    with rasterio.open(band1_path) as src1, \
-         rasterio.open(band2_path) as src2, \
-         rasterio.open(band3_path) as src3:
+    with rasterio.open(band1_path) as src1, rasterio.open(
+        band2_path
+    ) as src2, rasterio.open(band3_path) as src3:
         b1 = src1.read(1)  # Read band 1
         b2 = src2.read(1)  # Read band 2
         b3 = src3.read(1)  # Read band 3
@@ -279,23 +279,32 @@ def merge_raster(band1_path, band2_path, band3_path, output_path):
     with rasterio.open(band1_path) as src:
         meta = src.meta.copy()
         meta.update(count=3)  # Update the band count to 3 for RGB
-        meta.update(dtype='uint8')  # Update the data type to ensure RGB interpretation
+        meta.update(
+            dtype="uint8"
+        )  # Update the data type to ensure RGB interpretation
         meta.update(nodata=None)  # Remove nodata value
 
     # Write stacked RGB image to output file
-    with rasterio.open(output_path, 'w', **meta) as dst:
+    with rasterio.open(output_path, "w", **meta) as dst:
         for i in range(3):  # Loop through each band
-            dst.write(b123[:, :, i], i+1)  # Write each band with the correct index (starting from 1)
+            dst.write(
+                b123[:, :, i], i + 1
+            )  # Write each band with the correct index (starting from 1)
 
     # Update color interpretation of bands
-    with rasterio.open(output_path, 'r+') as src:
-        src.colorinterp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
+    with rasterio.open(output_path, "r+") as src:
+        src.colorinterp = [
+            ColorInterp.red,
+            ColorInterp.green,
+            ColorInterp.blue,
+        ]
 
     print("RGB image saved as '{}'".format(output_path))
 
 
 # Place Code here for Georeferencing------------------------------------------
-    
+
+
 def getgt_proj(input_image):
     """
     Fetches the geotransform and projection of a given input image.
@@ -435,12 +444,9 @@ def getconfig(cfg_path):
         auth_token = config.get("LANCE", "auth_token")
         download_HDF_directory = config.get("LANCE", "download_HDF_directory")
         download_txt_directory = config.get("LANCE", "download_txt_directory")
-        xmin = config.get("BoundingBox", "xmin")
-        ymin = config.get("BoundingBox", "ymin")
-        ymax = config.get("BoundingBox", "ymax")
-        xmax = config.get("BoundingBox", "xmax")
         base_txt_url = config.get("LANCE", "base_txt_url")
         base_HDF_url = config.get("LANCE", "base_HDF_url")
+        kml_path = config.get("BoundingBox", "kml_path")
 
     except:
         print(
@@ -460,12 +466,9 @@ def getconfig(cfg_path):
         auth_token,
         download_HDF_directory,
         download_txt_directory,
-        xmin,
-        ymin,
-        ymax,
-        xmax,
         base_txt_url,
         base_HDF_url,
+        kml_path,
     )
 
 
@@ -487,12 +490,9 @@ def main():
         auth_token,
         download_HDF_directory,
         download_txt_directory,
-        xmin,
-        ymin,
-        ymax,
-        xmax,
         base_txt_url,
         base_HDF_url,
+        kml_path,
     ) = getconfig(configfile)
 
     # Split the string using a space delimiter (you can change this based on the actual delimiter)
@@ -530,7 +530,7 @@ def main():
         + hdf_year
         + day_of_year
         + "/"
-        + extract_granule(txt_url_full, xmin1, ymax1, xmax1, ymin1)
+        + extract_granule(txt_url_full, xmin, ymax, xmax, ymin)
         + '"'
     )
 
@@ -559,7 +559,7 @@ def main():
     ]
 
     # Take the 4 corners coordinates and place them in UL corner and LR corner format
-    ul_corner_coordinates = "( " + ymax + " " + ymax + " )"
+    ul_corner_coordinates = "( " + xmin + " " + ymax + " )"
     lr_corner_coordinates = "( " + xmax + " " + ymin + " )"
 
     # This section modifies the parameter file for the HEGTool to run
