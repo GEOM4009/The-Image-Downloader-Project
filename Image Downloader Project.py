@@ -13,8 +13,8 @@ from datetime import datetime
 import re
 import glob
 import rasterio
-from rasterio.merge import merge
-from rasterio.enums import Resampling
+from rasterio.enums import ColorInterp
+import numpy as np
 from osgeo import gdal
 import argparse
 from configparser import RawConfigParser
@@ -253,47 +253,49 @@ def add_datetime_to_filenames(
 
 
 # Place Code here for GeoTIFF merge (Philip) -------------------------------------------
-def merge_geotiffs(input_files, output_file, resampling=Resampling.nearest):
+# Resources used: Code snippet provided by Derek, AI and https://rasterio.readthedocs.io/en/stable/topics/color.html 
+def merge_raster(band1_path, band2_path, band3_path, output_path):
     """
-    Merge multiple GeoTIFF files with 3 bands (RGB) into a single GeoTIFF file.
+    Create an RGB image from three grayscale GeoTIFF bands.
 
     Parameters:
-    - input_files: List of input GeoTIFF file paths
-    - output_file: Output GeoTIFF file path for the merged image
-    - resampling: Resampling method (default: nearest)
+        band1_path (str): Path to the first grayscale GeoTIFF file.
+        band2_path (str): Path to the second grayscale GeoTIFF file.
+        band3_path (str): Path to the third grayscale GeoTIFF file.
+        output_path (str): Path to the output RGB GeoTIFF file.
     """
-    # Open all input GeoTIFF files
-    src_files_to_mosaic = []
-    for input_file in input_files:
-        src = rasterio.open(input_file)
-        src_files_to_mosaic.append(src)
+    # Open grayscale GeoTIFF files
+    with rasterio.open(band1_path) as src1, \
+         rasterio.open(band2_path) as src2, \
+         rasterio.open(band3_path) as src3:
+        b1 = src1.read(1)  # Read band 1
+        b2 = src2.read(1)  # Read band 2
+        b3 = src3.read(1)  # Read band 3
 
-    # Merge the GeoTIFFs with resampling
-    mosaic, out_transform = merge(
-        src_files_to_mosaic, method="first", resampling=resampling
-    )
+    # Stack bands into an array
+    b123 = np.stack([b1, b2, b3], axis=-1)
 
-    # Update metadata of the merged GeoTIFF
-    out_meta = src.meta.copy()
-    out_meta.update(
-        {
-            "driver": "GTiff",
-            "height": mosaic.shape[1],
-            "width": mosaic.shape[2],
-            "transform": out_transform,
-        }
-    )
+    # Get metadata from one of the input files
+    with rasterio.open(band1_path) as src:
+        meta = src.meta.copy()
+        meta.update(count=3)  # Update the band count to 3 for RGB
+        meta.update(dtype='uint8')  # Update the data type to ensure RGB interpretation
+        meta.update(nodata=None)  # Remove nodata value
 
-    # Write the merged GeoTIFF to disk
-    with rasterio.open(output_file, "w", **out_meta) as dest:
-        dest.write(mosaic)
+    # Write stacked RGB image to output file
+    with rasterio.open(output_path, 'w', **meta) as dst:
+        for i in range(3):  # Loop through each band
+            dst.write(b123[:, :, i], i+1)  # Write each band with the correct index (starting from 1)
 
-    print("Merge complete. Output file:", output_file)
+    # Update color interpretation of bands
+    with rasterio.open(output_path, 'r+') as src:
+        src.colorinterp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
+
+    print("RGB image saved as '{}'".format(output_path))
 
 
 # Place Code here for Georeferencing------------------------------------------
-
-
+    
 def getgt_proj(input_image):
     """
     Fetches the geotransform and projection of a given input image.
@@ -607,7 +609,7 @@ def main():
     output_GeoTIFF_combined = "MOD9_Merged_test.tif"
 
     # Use the integer value for nearest neighbor resampling (0)
-    merge_geotiffs(input_GeoTIFF_files, output_GeoTIFF_combined, resampling=0)
+    merge_raster(input_GeoTIFF_files, output_GeoTIFF_combined)
 
     output_image = "MOD9_GeoReferenced.tif"
     input_image = output_GeoTIFF_combined
