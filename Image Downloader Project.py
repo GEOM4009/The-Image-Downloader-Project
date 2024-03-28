@@ -141,6 +141,7 @@ def extract_granule_id(txt_file, kml_path):
     selected_granule = selected_granules.iloc[-1]
 
     # Export the selected granule to a GPKG for viewing in QGIS or another format to ensure accuracy
+    # Uncomment for use:
     # export_geom.to_file(
     # "Insert your file path .gpkg",
     # driver="GPKG",
