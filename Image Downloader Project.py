@@ -81,22 +81,16 @@ def download_txt_file(url, auth_token, download_txt_dir):
 
 
 # Text file processing function--------- (Collin)
-def extract_granule(txt_file, xmin1, ymax1, xmax1, ymin1):
 def extract_granule_id(txt_file, kml_path):
     """
-    This function takes the input text file and bounding box coordinates.
-    It loads in each GranuleID and corresponding attributes and takes the bounding coordinates as geometry (polygons)
-    The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned
 
     This function takes the input text file and bounding polygon KML file.
     It loads in each GranuleID and corresponding attributes and uses the GRingLatitude and GRingLongitude values as geometry
     There is an optional step that is commented that enables the users to export the selected geometry as a GPKG for troubleshooting/accuracy verification.
     The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned.
     The function uses an example bounding of Cambridge Bay (and the surrounding Airport and Canadian High Arctic Research Centre)
-    Parameters:
-        file_path (str): The path to the txt file directory
-        xmin1, ymax1, xmax1, ymin1 (float): The bounding box coordinates
 
+    Parameters:
         txt_file (str): The path to the txt file directory.
         kml_path (str): The path to the KML file containing bounding polygon.
     Returns:
@@ -121,6 +115,7 @@ def extract_granule_id(txt_file, kml_path):
     xmin, ymin, xmax, ymax = (
         aoi_geometry.bounds
     )  # .bounds gets the minumum bounding box (so the xmin, ymax, xmax, ymin) coordinates
+
     upper_left = "( " + str(xmin) + " " + str(ymax) + " )"
     lower_right = "( " + str(xmax) + " " + str(ymin) + " )"
 
