@@ -83,12 +83,15 @@ def download_txt_file(url, auth_token, download_txt_dir):
 # Text file processing function--------- (Collin)
 def extract_granule_id(txt_file, kml_path):
     """
-
     This function takes the input text file and bounding polygon KML file.
     It loads in each GranuleID and corresponding attributes and uses the GRingLatitude and GRingLongitude values as geometry
     There is an optional step that is commented that enables the users to export the selected geometry as a GPKG for troubleshooting/accuracy verification.
     The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned.
     The function uses an example bounding of Cambridge Bay (and the surrounding Airport and Canadian High Arctic Research Centre)
+
+    My inspiration for this code came from Derek's workshop #6 which uses the fiona supported drivers and opens a kml as a pdf.
+    The rest of the code used geopandas general methods as well as the coordinate format from the HEG tool
+
 
     Parameters:
         txt_file (str): The path to the txt file directory.
