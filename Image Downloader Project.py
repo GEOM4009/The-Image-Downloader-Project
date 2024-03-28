@@ -140,6 +140,20 @@ def extract_granule(txt_file, xmin1, ymax1, xmax1, ymin1):
 # This section of the code was taken from and AI generated script to search the
 # hdf file for the time
 def extract_date_from_filename(filename):
+    """
+    This function reads in an HDF file name and returns tha date from that file.
+
+    Parameters
+    ----------
+    filename : TYPE
+        DESCRIPTION: Entire file path and name of the HDF file
+
+    Returns
+    -------
+    hdf_date : TYPE
+        DESCRIPTION.
+
+    """
     match = re.search(r"A(\d{4})(\d{3})", filename)
     if match:
         year = match.group(1)
@@ -160,6 +174,30 @@ def modify_parameter_file(
     ul_corner_coordinates,
     lr_corner_coordinates,
 ):
+    """
+    This function goes in and modifies the inputted parameter file to change
+    the input_filename, output_filenames, the ul_corner_coordinates and the
+    lr_corner_coordinates. This is to adjust the HEGTool parameters to take in the
+    proper files and bounding boxes.
+
+    Parameters
+    ----------
+    parameter_file_path : TYPE
+        DESCRIPTION: This is the entire file path and name to the necessary txt parameter file for the HEGTool
+    input_filename : TYPE
+        DESCRIPTION: This is the entire file path and name to the necessary HDF file for the HEGTool
+    output_filenames : TYPE
+        DESCRIPTION: This is the entire file path and name for the three necessary HDF output files for the HEGTool
+    ul_corner_coordinates : TYPE
+        DESCRIPTION: The upper left coordinates in the proper format for the HEGTool
+    lr_corner_coordinates : TYPE
+        DESCRIPTION: The lower right coordinates in the proper format for the HEGTool
+
+    Returns
+    -------
+    None.
+
+    """
     with open(parameter_file_path, "r", newline="") as file:
         lines = file.readlines()
 
@@ -190,6 +228,20 @@ def modify_parameter_file(
 # I found out that the file was in Windows CR LF not in Unix LF
 # https://stackoverflow.com/questions/36422107/how-to-convert-crlf-to-lf-on-a-windows-machine-in-python
 def convert_windows_to_unix_line_endings(file_path):
+    """
+    This function takes the entire parameter file txt and converts it into
+    the proper Unix (LF) that it need to be in
+
+    Parameters
+    ----------
+    file_path : TYPE
+        DESCRIPTION: The entire file path and name of the parameter file
+
+    Returns
+    -------
+    None.
+
+    """
     WINDOWS_LINE_ENDING = b"\r\n"
     UNIX_LINE_ENDING = b"\n"
 
@@ -238,6 +290,25 @@ def get_newest_hdf_file(hdf_directory):
 def add_datetime_to_filenames(
     directory_path, base_filenames, formatted_datetime
 ):
+    """
+    This function takes in the path where you want the output HDF files to be in
+    and add the date taken from the HDF and add the base_filename in that order.
+
+    Parameters
+    ----------
+    directory_path : TYPE
+        DESCRIPTION.
+    base_filenames : TYPE
+        DESCRIPTION.
+    formatted_datetime : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    new_filenames : TYPE
+        DESCRIPTION.
+
+    """
     new_filenames = []
     for filename in base_filenames:
         # Split the file name and extension
@@ -423,6 +494,47 @@ def getargs():
 
 
 def getconfig(cfg_path):
+    """
+    This function takes in the configuration file path and returns all the
+    variables found within
+
+    Parameters
+    ----------
+    cfg_path : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    parameter_file_path : TYPE
+        DESCRIPTION.
+    directory_path : TYPE
+        DESCRIPTION.
+    hdf_directory : TYPE
+        DESCRIPTION.
+    base_filenames : TYPE
+        DESCRIPTION.
+    working_directory : TYPE
+        DESCRIPTION.
+    MRTBINDIR : TYPE
+        DESCRIPTION.
+    PGSHOME : TYPE
+        DESCRIPTION.
+    MRTDATADIR : TYPE
+        DESCRIPTION.
+    auth_token : TYPE
+        DESCRIPTION.
+    download_HDF_directory : TYPE
+        DESCRIPTION.
+    download_txt_directory : TYPE
+        DESCRIPTION.
+    base_txt_url : TYPE
+        DESCRIPTION.
+    base_HDF_url : TYPE
+        DESCRIPTION.
+    kml_path : TYPE
+        DESCRIPTION.
+
+    """
 
     cfg = os.path.expanduser(cfg_path)
     config = RawConfigParser()  # run the parser
