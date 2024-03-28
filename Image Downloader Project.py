@@ -22,6 +22,7 @@ import sys
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Polygon
+import fiona
 
 
 # New API download from LANCE NRT with token access (Zacharie)
@@ -81,57 +82,76 @@ def download_txt_file(url, auth_token, download_txt_dir):
 
 # Text file processing function--------- (Collin)
 def extract_granule(txt_file, xmin1, ymax1, xmax1, ymin1):
+def extract_granule_id(txt_file, kml_path):
     """
     This function takes the input text file and bounding box coordinates.
     It loads in each GranuleID and corresponding attributes and takes the bounding coordinates as geometry (polygons)
     The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned
 
+    This function takes the input text file and bounding polygon KML file.
+    It loads in each GranuleID and corresponding attributes and uses the GRingLatitude and GRingLongitude values as geometry
+    There is an optional step that is commented that enables the users to export the selected geometry as a GPKG for troubleshooting/accuracy verification.
+    The geodataframe is sorted by the inputted area of interest and the most recent entry is selected and returned.
+    The function uses an example bounding of Cambridge Bay (and the surrounding Airport and Canadian High Arctic Research Centre)
     Parameters:
         file_path (str): The path to the txt file directory
         xmin1, ymax1, xmax1, ymin1 (float): The bounding box coordinates
 
+        txt_file (str): The path to the txt file directory.
+        kml_path (str): The path to the KML file containing bounding polygon.
     Returns:
         selected_granuleID (str): A string containing the GranuleID for the hdf download request.
+        selected_granuleID (str): The selected granuleID.
+        upper_left (str): Coordinates of the upper left corner in the HEG tool format.
+        lower_right (str): Coordinates of the lower right corner in the HEG tool format.
     """
-    # Read the text file into a DataFrame skipping the first two rows
+    # Read the text file into a DataFrame skipping the first two rows as they are info
     df_txt = pd.read_csv(txt_file, skiprows=2)
 
-    # Convert bounding coordinates to Polygon geometries
+    # Import KML driver for reading the KML file
+    fiona.supported_drivers["KML"] = "rw"
+
+    # Read the kml file and extract the aoi polygon
+    poly_aoi = gpd.read_file(kml_path, driver="KML", crs="EPSG:4326")
+
+    # Extract geometry of the AOI
+    aoi_geometry = poly_aoi.geometry.iloc[0]
+
+    # Extract upper left and lower right coordinates and put it into the HEG readable format
+    xmin, ymin, xmax, ymax = (
+        aoi_geometry.bounds
+    )  # .bounds gets the minumum bounding box (so the xmin, ymax, xmax, ymin) coordinates
+    upper_left = "( " + str(xmin) + " " + str(ymax) + " )"
+    lower_right = "( " + str(xmax) + " " + str(ymin) + " )"
+
+    # Convert bounding coordinates to Polygon geometries to display where the imagery is
     geometry = [
         Polygon(
             [
-                (row["WestBoundingCoord"], row["SouthBoundingCoord"]),
-                (row["EastBoundingCoord"], row["SouthBoundingCoord"]),
-                (row["EastBoundingCoord"], row["NorthBoundingCoord"]),
-                (row["WestBoundingCoord"], row["NorthBoundingCoord"]),
+                (row["GRingLongitude1"], row["GRingLatitude1"]),
+                (row["GRingLongitude2"], row["GRingLatitude2"]),
+                (row["GRingLongitude3"], row["GRingLatitude3"]),
+                (row["GRingLongitude4"], row["GRingLatitude4"]),
             ]
         )
         for index, row in df_txt.iterrows()
     ]
 
     # Create a GeoDataFrame to house the entries
-    gdf = gpd.GeoDataFrame(df_txt, geometry=geometry)
+    gdf = gpd.GeoDataFrame(df_txt, geometry=geometry, crs="EPSG:4326")
 
-    # Define the boudning box aoi
-    bb = Polygon(
-        [(xmin1, ymax1), (xmax1, ymax1), (xmax1, ymin1), (xmin1, ymin1)]
-    )
+    # Filter based on AOI polygon kml
+    selected_granules = gdf[gdf.intersects(aoi_geometry)]
 
-    # To visualize the bounding box uncomment the code below
-    # Create a GeoDataFrame with the AOI polygon
-    # gdf_aoi = gpd.GeoDataFrame(geometry=[bb], crs='EPSG:4326')
-    # gdf_aoi.to_file("C:\\Users\\colli\\GEOM4009\\Group\\Test123.gpkg", driver='GPKG')
+    selected_granule = selected_granules.iloc[-1]
 
-    # Filter based on the bounding box
-    selected_granules = gdf[gdf.intersects(bb)]
+    # Export the selected granule to a GPKG for viewing in QGIS or another format to ensure accuracy
+    # export_geom.to_file(
+    # "Insert your file path .gpkg",
+    # driver="GPKG",
+    #  )
 
-    # Select the last entry for most recent imagery
-    selected_granuleID = selected_granules["# GranuleID"].iloc[-1]
-
-    # Ensures data is returned as a string
-    selected_granuleID = str(selected_granuleID)
-
-    return selected_granuleID
+    return str(selected_granule["# GranuleID"]), upper_left, lower_right
 
 
 # Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
