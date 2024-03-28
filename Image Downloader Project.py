@@ -46,7 +46,7 @@ def download_HDF_file(url, auth_token, download_HDF_dir):
 
     try:
         # Execute the wget command
-        subprocess.run(command, check=True)
+        subprocess.run(command, shell=True)
         print("HDF file downloaded successfully.")
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
@@ -73,7 +73,7 @@ def download_txt_file(url, auth_token, download_txt_dir):
 
     try:
         # Execute the wget command
-        subprocess.run(command, check=True)
+        subprocess.run(command, shell=True)
         print("HDF file downloaded successfully.")
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
@@ -640,34 +640,44 @@ def main():
         print("There was an error in splitting the base file names")
 
     # Get the date from today in UTC time to build the correct url for txt download
+    # Get the current UTC date and time
     t = datetime.utcnow()
-    txt_file_name = datetime.strftime(t, "MOD03_%Y-%m-%d.txt")
-    url_year = datetime.strftime(t, "%Y/")
-    txt_url_full = '"' + base_txt_url + url_year + txt_file_name + '"'
+
+    # Format the date string for the text file name
+    txt_file_name = datetime.strftime(t, "MYD03_%Y-%m-%d.txt")
+
+    # Construct the full URL for the text file download
+    txt_url_full = (
+        '"' + base_txt_url + datetime.strftime(t, "%Y/") + txt_file_name + '"'
+    )
 
     # Download the txt file for that day
-    download_txt_file(txt_url_full, auth_token, download_txt_directory)
+    #   download_txt_file(txt_url_full, auth_token, download_txt_directory)
+
+    print("--------------------------")
 
     hdf_year = datetime.strftime(t, "%Y/0")
     day_of_year = str(t.timetuple().tm_yday)
 
+    granule_id, upper_left, lower_right = extract_granule_id(
+        download_txt_directory, kml_path
+    )
+    print("--------------------------")
+    print(granule_id)
+    print("--------------------------")
+
     # This part read the txt file and places all the HDF ID's in lists with their info and bounding coordinates
     hdf_url_full = (
-        '"'
-        + base_HDF_url
-        + hdf_year
-        + day_of_year
-        + "/"
-        + extract_granule(txt_url_full, xmin, ymax, xmax, ymin)
-        + '"'
+        '"' + base_HDF_url + hdf_year + day_of_year + "/" + granule_id + '"'
     )
-
+    print(hdf_url_full)
     # This line downloads the hdf file with the full url with new hdf file name
-    download_HDF_file(hdf_url_full, auth_token, download_HDF_directory)
+    # download_HDF_file(hdf_url_full, auth_token, download_HDF_directory)
 
     # This line takes the newest file in the hdf directory
     input_hdf_filename = get_newest_hdf_file(hdf_directory)
-
+    print("--------------------------")
+    print(input_hdf_filename)
     # Extract date from hdf file
     hdf_date = extract_date_from_filename(input_hdf_filename)
 
@@ -685,18 +695,18 @@ def main():
     file_names_only = [
         os.path.split(file_path)[1] for file_path in new_date_output_filenames
     ]
+    print("--------------------------")
+    print(upper_left)
 
-    # Take the 4 corners coordinates and place them in UL corner and LR corner format
-    ul_corner_coordinates = "( " + xmin + " " + ymax + " )"
-    lr_corner_coordinates = "( " + xmax + " " + ymin + " )"
+    input_hdf_filename = "MOD09.A2024088.2035.061.2024088213921.NRT.hdf"
 
     # This section modifies the parameter file for the HEGTool to run
     modify_parameter_file(
         parameter_file_path,
         input_hdf_filename,
         new_date_output_filenames,
-        ul_corner_coordinates,
-        lr_corner_coordinates,
+        upper_left,
+        lower_right,
     )
     # This makes sure that the file is still in the correct Unix LF format
     convert_windows_to_unix_line_endings(parameter_file_path)
@@ -718,35 +728,45 @@ def main():
         parameter_file_path,
     ]
 
-    try:
+    """try:
         # Execute the command
-        subprocess.run(command, check=True)
+        subprocess.run(command, shell=True)
         print("HegTool executed successfully.")
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
         print("Error running HegTool:", e)
+        """
+    directory_path = r"C:\Users\zachs\Desktop\tmp\testing\TIFF_Bands"
 
     os.chdir(directory_path)
 
-    input_GeoTIFF_files = [
-        file_names_only[0],
-        file_names_only[1],
-        file_names_only[2],
-    ]
+    output_GeoTIFF_combined = (
+        r"C:\Users\zachs\Desktop\tmp\testing\Merged_TIFF\MOD9_Merged_test.tif"
+    )
+
+    band1_path = r"C:\Users\zachs\Desktop\tmp\testing\TIFF_Bands\MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band1.tif"
+    band2_path = r"C:\Users\zachs\Desktop\tmp\testing\TIFF_Bands\MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band2.tif"
+    band3_path = r"C:\Users\zachs\Desktop\tmp\testing\TIFF_Bands\MOD09.A2018237.0145.061.2021339074858_MODIS_SWATH_TYPE_L2_Band3.tif"
+
+    merge_raster(band1_path, band2_path, band3_path, output_GeoTIFF_combined)
 
     output_GeoTIFF_combined = "MOD9_Merged_test.tif"
 
-    # Use the integer value for nearest neighbor resampling (0)
-    merge_raster(input_GeoTIFF_files, output_GeoTIFF_combined)
+    input_image_path = (
+        r"C:\Users\zachs\Desktop\tmp\testing\Merged_TIFF\MOD9_Merged_test.tif"
+    )
 
-    output_image = "MOD9_GeoReferenced.tif"
-    input_image = output_GeoTIFF_combined
+    geotransform, projection = getgt_proj(input_image_path)
 
-    geotransform, projection = getgt_proj(output_GeoTIFF_combined)
-    georeference_image(input_image, output_image, geotransform, projection)
+    output_image = r"C:\Users\zachs\Desktop\tmp\testing\Merged_TIFF\GepReferemced_test.tif"
+    georeference_image(
+        input_image_path, output_image, geotransform, projection
+    )
 
     input_tiff = output_image
-    output_kmz = "MOD9_KML.kml"
+    output_kmz = (
+        r"C:\Users\zachs\Desktop\tmp\testing\Merged_TIFF\MOD9_Test_KML.kml"
+    )
     convert_to_kmz(input_tiff, output_kmz)
 
 
