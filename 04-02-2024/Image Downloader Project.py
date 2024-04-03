@@ -12,7 +12,6 @@ Created on Fri Mar 12 11:42:00 2024
 import os
 import subprocess
 from datetime import datetime
-import re
 import glob
 import rasterio
 from rasterio.enums import ColorInterp
@@ -29,9 +28,9 @@ import shutil
 
 # Import KML driver for reading the KML file
 # $ I don't seem to have that driver and so I put LIBKML here
-fiona.supported_drivers[
-    "LIBKML"
-] = "rw"  # $ you might want to put this line near the imports above the functions
+fiona.supported_drivers["LIBKML"] = (
+    "rw"  # $ you might want to put this line near the imports above the functions
+)
 
 
 # New API download from LANCE NRT with token access (Zacharie)
@@ -87,7 +86,9 @@ def download_HDF_file(url, auth_token, download_HDF_dir):
             print("HDF file not found...  it may not be available yet...")
             return "not found"
         else:
-            print("HDF file download didn't work out... Try debugging the code")
+            print(
+                "HDF file download didn't work out... Try debugging the code"
+            )
             return "error"
 
     except subprocess.CalledProcessError as e:
@@ -200,7 +201,9 @@ def extract_granule_id(txt_file, kml_path, testmode):
     # $ Should trap errors here if no modis images intersect!
     selected_granules = gdf[gdf.intersects(aoi_geometry)]
     # $ remove night images
-    selected_granules = selected_granules[selected_granules.DayNightFlag == "D"]
+    selected_granules = selected_granules[
+        selected_granules.DayNightFlag == "D"
+    ]
     selected_granules.reset_index(drop=True, inplace=True)
     # $ this will export the df:
     selected_granules.to_file("test_selectedmodis.kml", driver="LIBKML")
@@ -310,7 +313,9 @@ def modify_parameter_file(
         if line.strip().startswith("INPUT_FILENAME"):
             modified_lines.append(f"INPUT_FILENAME = {input_filename}\n")
         elif line.strip().startswith("OUTPUT_FILENAME"):
-            modified_lines.append(f"OUTPUT_FILENAME = {output_filenames.pop(0)}\n")
+            modified_lines.append(
+                f"OUTPUT_FILENAME = {output_filenames.pop(0)}\n"
+            )
         elif line.strip().startswith("SPATIAL_SUBSET_UL_CORNER"):
             modified_lines.append(
                 f"SPATIAL_SUBSET_UL_CORNER = {ul_corner_coordinates}\n"
@@ -356,7 +361,9 @@ def convert_windows_to_unix_line_endings(file_path):
         with open(file_path, "wb") as open_file:
             open_file.write(content)
 
-        print(f"Line endings converted from Windows (CRLF) to Unix (LF) in {file_path}")
+        print(
+            f"Line endings converted from Windows (CRLF) to Unix (LF) in {file_path}"
+        )
     except IOError:
         print(f"Error: Unable to open or modify file {file_path}")
 
@@ -387,7 +394,9 @@ def get_newest_hdf_file(hdf_directory):
         return None
 
 
-def add_datetime_to_filenames(directory_path, base_filenames, formatted_datetime):
+def add_datetime_to_filenames(
+    directory_path, base_filenames, formatted_datetime
+):
     """
     This function takes in the path where you want the output HDF files to be in
     and add the date taken from the HDF and add the base_filename in that order.
@@ -447,7 +456,9 @@ def merge_raster(band1_path, band2_path, band3_path, output_path):
     # $ rescale the image to byte
     # $ create a masked image that ignores the no data value
     # https://stackoverflow.com/questions/49922460/scale-a-numpy-array-with-from-0-1-0-2-to-0-255
-    b123masked = np.ma.masked_equal(b123, -28672)  # $ this is the no data value
+    b123masked = np.ma.masked_equal(
+        b123, -28672
+    )  # $ this is the no data value
     scaled = (
         (b123masked - np.min(b123masked))
         * (1 / (np.max(b123masked) - np.min(b123masked)) * 255)
@@ -461,7 +472,9 @@ def merge_raster(band1_path, band2_path, band3_path, output_path):
         meta = src.meta.copy()
         meta.update(count=3)  # Update the band count to 3 for RGB
         # $ if you want to do this you need to actually change the data from int16 to uint8, otherwise it won't work... Look up scale numpy array to 0-255
-        meta.update(dtype="uint8")  # Update the data type to ensure RGB interpretation
+        meta.update(
+            dtype="uint8"
+        )  # Update the data type to ensure RGB interpretation
         meta.update(nodata=0)  # Remove nodata value
 
     # Write stacked RGB image to output file
@@ -671,7 +684,9 @@ def getconfig(cfg_path):
         kml_path = config.get("BoundingBox", "kml_path")
 
     except:
-        print("Trouble reading config file, please check the file and path are valid\n")
+        print(
+            "Trouble reading config file, please check the file and path are valid\n"
+        )
         sys.exit(1)
 
     return (  # $ maybe a dictionary would be an easier way to gather this all together?
@@ -725,7 +740,9 @@ def main():
         base_filenames = [x.strip() for x in base_filenames.splitlines()]
         # then remove empty rows
         base_filenames = [
-            base_filenames for base_filenames in base_filenames if base_filenames
+            base_filenames
+            for base_filenames in base_filenames
+            if base_filenames
         ]
 
         print(base_filenames)
@@ -757,8 +774,8 @@ def main():
 
     print("--------------------------")
 
-    hdf_year = datetime.strftime(t, "%Y/0")
-    day_of_year = str(t.timetuple().tm_yday)
+    # hdf_year = datetime.strftime(t, "%Y/0")
+    # day_of_year = str(t.timetuple().tm_yday)
 
     granule_id, upper_left, lower_right = extract_granule_id(
         metadata_file, kml_path, test_time
@@ -796,7 +813,9 @@ def main():
     # $ this line of code needs to be uncommented for the code to work!
     # $ added a condition so you don't download the file more than once
     if not os.path.isfile(os.path.join(download_HDF_directory, granule_id)):
-        msg = download_HDF_file(hdf_url_full, auth_token, download_HDF_directory)
+        msg = download_HDF_file(
+            hdf_url_full, auth_token, download_HDF_directory
+        )
 
         # $ no sense going on without the image you need.
         if msg != "ok":
@@ -816,7 +835,9 @@ def main():
     hdf_date = extract_date_from_filename(input_hdf_filename)
     # $ note only date is retrieved, not time?!
     if hdf_date:
-        formatted_datetime = hdf_date.strftime("%Y-%m-%d_%H:%M")  # $ replaced . with :
+        formatted_datetime = hdf_date.strftime(
+            "%Y-%m-%d_%H%M"
+        )  # $ replaced . with :
         print("Extracted Date from HDF Filename:", formatted_datetime)
     else:
         print("Failed to extract date from HDF filename.")
@@ -824,14 +845,14 @@ def main():
     new_date_output_filenames = add_datetime_to_filenames(
         directory_path, base_filenames, formatted_datetime
     )
-
+    """
     # Split the path from the file name for each file in new_date_output_filenames for later geotiff merge
     file_names_only = [
         os.path.split(file_path)[1] for file_path in new_date_output_filenames
     ]
     print("--------------------------")
     print(upper_left)
-
+    """
     # $ comment this out! input_hdf_filename = "MOD09.A2024088.2035.061.2024088213921.NRT.hdf"
     # $ copy the list above to a tuple because it gets modified by the function below
     tifbands = tuple(new_date_output_filenames)
@@ -859,14 +880,16 @@ def main():
     # https://www.hdfeos.org/software/heg.php
 
     command = [
-        "./swtif",  # $ I added ./ here due to linux path issues... but don't do this for windows
+        "swtif",  # $ I added ./ here due to linux path issues... but don't do this for windows
         "-p",
         parameter_file_path,
     ]
 
     try:
         # Execute the command
-        subprocess.run(command, shell=False)  # $ changed shell from true to false
+        subprocess.run(
+            command, shell=False
+        )  # $ changed shell from true to false
         print("HegTool executed successfully.")
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
@@ -882,7 +905,9 @@ def main():
         download_HDF_directory, f"{formatted_datetime}_aqua.tif"
     )
 
-    merge_raster(tifbands[0], tifbands[1], tifbands[2], output_GeoTIFF_combined)
+    merge_raster(
+        tifbands[0], tifbands[1], tifbands[2], output_GeoTIFF_combined
+    )
 
     """
     # $ code not needed was removed from here
@@ -903,7 +928,9 @@ def main():
     shutil.make_archive(
         f"{formatted_datetime}_aqua.kmz", "zip", root_dir="tmp", base_dir=None
     )
-    shutil.move(f"{formatted_datetime}_aqua.kmz.zip", f"{formatted_datetime}_aqua.kmz")
+    shutil.move(
+        f"{formatted_datetime}_aqua.kmz.zip", f"{formatted_datetime}_aqua.kmz"
+    )
 
     # $ after you convert to kml you could zip the files in to a kmz, then there would be no conflict between
     # $ the subdirectories here...
@@ -913,7 +940,7 @@ def main():
     os.remove(tifbands[1])
     os.remove(tifbands[2])
     shutil.rmtree("tmp")
-    # os.remove(output_GeoTIFF_combined)
+    os.remove(output_GeoTIFF_combined)
     # $ can clean up old hdf files too...
 
 
