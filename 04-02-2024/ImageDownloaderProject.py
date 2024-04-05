@@ -575,16 +575,25 @@ def convert_to_kmz(input_tiff, output_kmz):
     - input_tiff: Path to the input GeoTIFF image.
     - output_kmz: Path to the output KMZ file.
     """
+
+	# Specify the full path to gdal_translate
+    gdal_translate_path = 'C:\\Users\\zachs\\anaconda3\\envs\\geom4009\\Library\\bin\\gdal_translate.exe'
+    
     # 'gdal_translate' is a GDAL utility used to convert raster data between different formats, '-of' 'KMLSUPEROVERLAY' specify the output format
     command = [
-        "gdal_translate",
+        gdal_translate_path,
         "-of",
         "KMLSUPEROVERLAY",
         input_tiff,
         output_kmz,
     ]
-    subprocess.run(command)
-    print("Conversion to KMZ complete.")
+    # Run the command
+    try:
+        subprocess.run(command, shell=False)
+        print("Conversion to KMZ complete.")
+    except Exception as e:
+        print(f"Error during conversion to KMZ: {e}")
+
 
 
 # Place Code to Read from config file (Zacharie) -------------------------------------------------
@@ -853,7 +862,7 @@ def main():
     print("--------------------------")
     print(upper_left)
     """
-    # $ comment this out! input_hdf_filename = "MOD09.A2024088.2035.061.2024088213921.NRT.hdf"
+
     # $ copy the list above to a tuple because it gets modified by the function below
     tifbands = tuple(new_date_output_filenames)
 
