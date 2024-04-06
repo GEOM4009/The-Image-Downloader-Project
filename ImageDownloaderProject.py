@@ -464,7 +464,7 @@ def merge_raster(band1, band2, band3, output_name):
 
 
 # Place Code here for GeoTIFF to KML conversion (Shea) ------------------------------
-def convert_to_kmz(input_tiff, output_kmz, gdal_translate_path):
+def convert_to_kmz(input_tiff, output_kmz):
     """
     This function converts a GeoTIFF file into a superoverlay kmz file.
 
@@ -484,8 +484,10 @@ def convert_to_kmz(input_tiff, output_kmz, gdal_translate_path):
     """
 
     # 'gdal_translate' is a GDAL utility used to convert raster data between different formats, '-of' 'KMLSUPEROVERLAY' specify the output format
+    gdal_translate = "C:/Users/zachs/anaconda3/envs/geom4009/Library/bin/gdal_translate.exe"
+
     command = [
-        gdal_translate_path,
+        gdal_translate,
         "-of",
         "KMLSUPEROVERLAY",
         input_tiff,
