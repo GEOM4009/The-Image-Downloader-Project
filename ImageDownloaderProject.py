@@ -811,7 +811,6 @@ def main():
     # $ the subdirectories here...
     # Uncommnet this section if you want to delete all the extra files
     """
-    # $ Clean up temporary files  - uncomment this when you are ready to deploy the code
     os.chdir(GeoTIFF_folder)
     
     # Get a list of all files and subdirectories in the folder
