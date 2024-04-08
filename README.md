@@ -1,56 +1,53 @@
 # Image Downloader Project
 
 ## Introduction
-This script is developed for the Polar Continental Shelf Program (PCSP) under Natural Resources Canada. It automates the downloading and processing of satellite imagery for Arctic regions, facilitating the logistical coordination of the PCSP's activities.
+This script is developed for the Polar Continental Shelf Program (PCSP) under Natural Resources Canada. It automates the downloading and processing of satellite imagery for a designated area of interest KML file, facilitating the logistical coordination of the PCSP's activities. The Imagery is taken from MODIS AQUA using LANCE and results in a KMZ for use in Google Earth or other software. 
 
 ## Getting Started
-These instructions will guide you on setting up your own instance of the Image Downloader.
+This README file is intended to provide brief instruction on how to set up the application and where to find guides/resources to specific tools. 
 
 ### Prerequisites
 Before you begin, ensure you have met the following requirements:
+- Windows Operating System
 - Python 3.8 or higher
-- GDAL
-- Rasterio
-- OWSLib
+- imagedownload_env.yml
+- Heg Tool 
+- Task Scheduler for Windows
+- Area of Interest KML
+- Config File
+- Parameter File
 
 ### Installation
-To install Image Downloader Project, follow these steps:
-1. Clone the repository: `git clone <repo_url>`
-2. Install the required Python packages: `pip install -r requirements.txt`
+1. For environment installation demo, see Installation Guide folder
+2. For Heg Tool installation demo, see Installation Guide folder
+3. For Task Scheduler demo, see Installation Guide folder
 
-### Usage
-Add useful examples of how the project can be used?? screenshots and code blocks to demonstrate its use? 
+### Set-up Configuration File
+1. Open config file 
+2. Update all necessary paths to reflect your operating system paths
+3. See config file for blank paths (to be filled). 
 
-## Documentation
-The `docs/` folder contains all documentation for the project. Refer to `docs/README.md` for an overview.
-
-### Workflow
-The project follows this workflow:
-1. Download imagery using API.
-2. Convert and georeference imagery.
-3. Save as KMZ for Google Earth Pro.
-4. Schedule to run at intervals throughout the day.
-
-### Troubleshooting/FAQ
-If you encounter issues, please refer to the `FAQ.md` in the documentation folder.
+### Troubleshooting
+If you encounter issues, please refer to the Imager Download Project Git Hub for troubleshooting. 
 
 ## Contributing to Image Downloader Project
-To contribute, follow these steps:
-1. Fork the repository.
-2. Create a branch: `git checkout -b <branch_name>`.
-3. Make your changes and commit them: `git commit -m '<commit_message>'`
-4. Push to the original branch: `git push origin <project_name>/<location>`
-5. Create the pull request.
+If you wish to contribute to the Image Downloader Project: 
+1. Clone the repository: <https://github.com/GEOM4009/The-Image-Downloader-Project>
+2. Create a branch
+3. Make your adjustments/contributions
+4. Commit your changes and describe your workflow
+5. Request for merge to the main branch
 
 ## Contributors
-Thanks to the following people who have contributed to this project:
+Thanks to the main contributors of this project:
+- Zacharie Sauvé
+- Derek Mueller
+- Collin Godsell
 - Philip Ishola
 - Shea Timmins
-- Zacharie Sauvé
-- Collin Godsell
 
 ## Contact
-If you want to contact the team, please reach out to our emails??? idk
+If you wish to contact any contributors, reach out through the Image Downloader Project Git Hub community page.
 
 ## License
-This project uses the following license: [MIT License](LICENSE). (IDK the template said put a license and MIT license came up)
+This project uses the MIT License. For licensing detials please refer to the MIT License text document in the main repository. 
