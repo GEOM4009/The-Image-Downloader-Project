@@ -210,39 +210,172 @@
       <SimpleField name="GRingLatitude3" type="float"/>
       <SimpleField name="GRingLatitude4" type="float"/>
     </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
+    <Schema id="test_selectedmodis.schema">
+      <SimpleField name="# GranuleID" type="string"/>
+      <SimpleField name="StartDateTime" type="string"/>
+      <SimpleField name="ArchiveSet" type="string"/>
+      <SimpleField name="OrbitNumber" type="string"/>
+      <SimpleField name="DayNightFlag" type="string"/>
+      <SimpleField name="EastBoundingCoord" type="float"/>
+      <SimpleField name="NorthBoundingCoord" type="float"/>
+      <SimpleField name="SouthBoundingCoord" type="float"/>
+      <SimpleField name="WestBoundingCoord" type="float"/>
+      <SimpleField name="GRingLongitude1" type="float"/>
+      <SimpleField name="GRingLongitude2" type="float"/>
+      <SimpleField name="GRingLongitude3" type="float"/>
+      <SimpleField name="GRingLongitude4" type="float"/>
+      <SimpleField name="GRingLatitude1" type="float"/>
+      <SimpleField name="GRingLatitude2" type="float"/>
+      <SimpleField name="GRingLatitude3" type="float"/>
+      <SimpleField name="GRingLatitude4" type="float"/>
+    </Schema>
     <Document id="test_selectedmodis">
       <name>test_selectedmodis</name>
       <Placemark id="test_selectedmodis.1">
         <ExtendedData>
           <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.0055.061.2024090032958.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 00:55</SimpleData>
+            <SimpleData name="# GranuleID">MYD03.A2024099.0030.061.2024099025241.NRT.hdf</SimpleData>
+            <SimpleData name="StartDateTime">2024-04-08 00:30</SimpleData>
             <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116561</SimpleData>
+            <SimpleData name="OrbitNumber">116692</SimpleData>
             <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-143.190496276458</SimpleData>
-            <SimpleData name="NorthBoundingCoord">83.9097338797054</SimpleData>
-            <SimpleData name="SouthBoundingCoord">59.3901565282024</SimpleData>
-            <SimpleData name="WestBoundingCoord">124.406275827158</SimpleData>
-            <SimpleData name="GRingLongitude1">-154.460270802006</SimpleData>
-            <SimpleData name="GRingLongitude2">160.323690520733</SimpleData>
-            <SimpleData name="GRingLongitude3">124.129504051304</SimpleData>
-            <SimpleData name="GRingLongitude4">-142.132689203897</SimpleData>
-            <SimpleData name="GRingLatitude1">65.8388120787685</SimpleData>
-            <SimpleData name="GRingLatitude2">59.386471457492</SimpleData>
-            <SimpleData name="GRingLatitude3">70.0139143257549</SimpleData>
-            <SimpleData name="GRingLatitude4">83.956768710403</SimpleData>
+            <SimpleData name="EastBoundingCoord">-145.841163580872</SimpleData>
+            <SimpleData name="NorthBoundingCoord">78.122767444167</SimpleData>
+            <SimpleData name="SouthBoundingCoord">54.5892161700242</SimpleData>
+            <SimpleData name="WestBoundingCoord">145.368350720346</SimpleData>
+            <SimpleData name="GRingLongitude1">-148.787886000868</SimpleData>
+            <SimpleData name="GRingLongitude2">172.61860442101</SimpleData>
+            <SimpleData name="GRingLongitude3">144.96539164386</SimpleData>
+            <SimpleData name="GRingLongitude4">-145.668149486524</SimpleData>
+            <SimpleData name="GRingLatitude1">60.089289003874</SimpleData>
+            <SimpleData name="GRingLatitude2">54.5824399381523</SimpleData>
+            <SimpleData name="GRingLatitude3">67.5645950233259</SimpleData>
+            <SimpleData name="GRingLatitude4">78.3746114817319</SimpleData>
           </SchemaData>
         </ExtendedData>
         <Polygon>
           <outerBoundaryIs>
             <LinearRing>
               <coordinates>
-                -154.460270802006,65.8388120787685,0
-                160.323690520733,59.386471457492,0
-                124.129504051304,70.0139143257549,0
-                -142.132689203897,83.956768710403,0
-                -154.460270802006,65.8388120787685,0
+                -148.787886000868,60.089289003874,0
+                172.61860442101,54.5824399381523,0
+                144.96539164386,67.5645950233259,0
+                -145.668149486524,78.3746114817319,0
+                -148.787886000868,60.089289003874,0
               </coordinates>
             </LinearRing>
           </outerBoundaryIs>
@@ -251,34 +384,34 @@
       <Placemark id="test_selectedmodis.2">
         <ExtendedData>
           <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.0230.061.2024090044258.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 02:30</SimpleData>
+            <SimpleData name="# GranuleID">MYD03.A2024099.0210.061.2024099041749.NRT.hdf</SimpleData>
+            <SimpleData name="StartDateTime">2024-04-08 02:10</SimpleData>
             <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116562</SimpleData>
+            <SimpleData name="OrbitNumber">116693</SimpleData>
             <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-179.534580128427</SimpleData>
-            <SimpleData name="NorthBoundingCoord">70.446558420226</SimpleData>
-            <SimpleData name="SouthBoundingCoord">47.8102192639377</SimpleData>
-            <SimpleData name="WestBoundingCoord">129.293884187271</SimpleData>
-            <SimpleData name="GRingLongitude1">-179.327530237611</SimpleData>
-            <SimpleData name="GRingLongitude2">148.200991783873</SimpleData>
-            <SimpleData name="GRingLongitude3">128.892478066921</SimpleData>
-            <SimpleData name="GRingLongitude4">-179.541373513174</SimpleData>
-            <SimpleData name="GRingLatitude1">52.4410218816962</SimpleData>
-            <SimpleData name="GRingLatitude2">47.8024926259616</SimpleData>
-            <SimpleData name="GRingLatitude3">62.6967722286632</SimpleData>
-            <SimpleData name="GRingLatitude4">70.7773171946834</SimpleData>
+            <SimpleData name="EastBoundingCoord">-165.029052739297</SimpleData>
+            <SimpleData name="NorthBoundingCoord">82.6065922634154</SimpleData>
+            <SimpleData name="SouthBoundingCoord">58.3361723864689</SimpleData>
+            <SimpleData name="WestBoundingCoord">109.390760346455</SimpleData>
+            <SimpleData name="GRingLongitude1">-173.273069392021</SimpleData>
+            <SimpleData name="GRingLongitude2">143.191587630229</SimpleData>
+            <SimpleData name="GRingLongitude3">109.057901545654</SimpleData>
+            <SimpleData name="GRingLongitude4">-164.354298145182</SimpleData>
+            <SimpleData name="GRingLatitude1">64.5464518507577</SimpleData>
+            <SimpleData name="GRingLatitude2">58.3321012665223</SimpleData>
+            <SimpleData name="GRingLatitude3">69.5748792681567</SimpleData>
+            <SimpleData name="GRingLatitude4">82.728386444631</SimpleData>
           </SchemaData>
         </ExtendedData>
         <Polygon>
           <outerBoundaryIs>
             <LinearRing>
               <coordinates>
-                -179.327530237611,52.4410218816962,0
-                148.200991783873,47.8024926259616,0
-                128.892478066921,62.6967722286632,0
-                -179.541373513174,70.7773171946834,0
-                -179.327530237611,52.4410218816962,0
+                -173.273069392021,64.5464518507577,0
+                143.191587630229,58.3321012665223,0
+                109.057901545654,69.5748792681567,0
+                -164.354298145182,82.728386444631,0
+                -173.273069392021,64.5464518507577,0
               </coordinates>
             </LinearRing>
           </outerBoundaryIs>
@@ -287,326 +420,25 @@
       <Placemark id="test_selectedmodis.3">
         <ExtendedData>
           <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.0235.061.2024090044745.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 02:35</SimpleData>
+            <SimpleData name="# GranuleID">MYD03.A2024099.1345.061.2024099154127.NRT.hdf</SimpleData>
+            <SimpleData name="StartDateTime">2024-04-08 13:45</SimpleData>
             <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116562</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-134.355971810143</SimpleData>
-            <SimpleData name="NorthBoundingCoord">88.3883025333993</SimpleData>
-            <SimpleData name="SouthBoundingCoord">62.8212016813941</SimpleData>
-            <SimpleData name="WestBoundingCoord">86.1317026937085</SimpleData>
-            <SimpleData name="GRingLongitude1">-178.422743354412</SimpleData>
-            <SimpleData name="GRingLongitude2">129.40512308566</SimpleData>
-            <SimpleData name="GRingLongitude3">86.0628325966549</SimpleData>
-            <SimpleData name="GRingLongitude4">-126.662582425889</SimpleData>
-            <SimpleData name="GRingLatitude1">70.2757812733143</SimpleData>
-            <SimpleData name="GRingLatitude2">62.8192273353484</SimpleData>
-            <SimpleData name="GRingLatitude3">70.8796131821084</SimpleData>
-            <SimpleData name="GRingLatitude4">87.5236966269249</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -178.422743354412,70.2757812733143,0
-                129.40512308566,62.8192273353484,0
-                86.0628325966549,70.8796131821084,0
-                -126.662582425889,87.5236966269249,0
-                -178.422743354412,70.2757812733143,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.4">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.1230.061.2024090143933.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 12:30</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116568</SimpleData>
+            <SimpleData name="OrbitNumber">116700</SimpleData>
             <SimpleData name="DayNightFlag">D</SimpleData>
             <SimpleData name="EastBoundingCoord">180</SimpleData>
-            <SimpleData name="NorthBoundingCoord">89.9924067781284</SimpleData>
-            <SimpleData name="SouthBoundingCoord">68.4650798226736</SimpleData>
+            <SimpleData name="NorthBoundingCoord">89.9913231980516</SimpleData>
+            <SimpleData name="SouthBoundingCoord">67.7585237197658</SimpleData>
             <SimpleData name="WestBoundingCoord">-180</SimpleData>
-            <SimpleData name="GRingLongitude1">38.2008840190676</SimpleData>
-            <SimpleData name="GRingLongitude2">-36.0983067444567</SimpleData>
-            <SimpleData name="GRingLongitude3">-88.7917394606682</SimpleData>
-            <SimpleData name="GRingLongitude4">-173.898351105315</SimpleData>
-            <SimpleData name="GRingLatitude1">79.017869486975</SimpleData>
-            <SimpleData name="GRingLatitude2">68.4644137385036</SimpleData>
-            <SimpleData name="GRingLatitude3">69.5822693302085</SimpleData>
-            <SimpleData name="GRingLatitude4">81.9626109147494</SimpleData>
+            <SimpleData name="GRingLongitude1">18.3211341214116</SimpleData>
+            <SimpleData name="GRingLongitude2">-51.9017522159243</SimpleData>
+            <SimpleData name="GRingLongitude3">-103.920616936031</SimpleData>
+            <SimpleData name="GRingLongitude4">164.696145872482</SimpleData>
+            <SimpleData name="GRingLatitude1">77.7943186474728</SimpleData>
+            <SimpleData name="GRingLatitude2">67.757793935074</SimpleData>
+            <SimpleData name="GRingLatitude3">69.9597748466323</SimpleData>
+            <SimpleData name="GRingLatitude4">83.1722411272121</SimpleData>
           </SchemaData>
         </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                38.2008840190676,79.017869486975,0
-                -36.0983067444567,68.4644137385036,0
-                -88.7917394606682,69.5822693302085,0
-                -173.898351105315,81.9626109147494,0
-                38.2008840190676,79.017869486975,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.5">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.1545.061.2024090175557.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 15:45</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116570</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">26.9896755770704</SimpleData>
-            <SimpleData name="NorthBoundingCoord">88.3196592153793</SimpleData>
-            <SimpleData name="SouthBoundingCoord">62.777200782869</SimpleData>
-            <SimpleData name="WestBoundingCoord">-111.14970446743</SimpleData>
-            <SimpleData name="GRingLongitude1">-15.9419170954586</SimpleData>
-            <SimpleData name="GRingLongitude2">-67.9744935691197</SimpleData>
-            <SimpleData name="GRingLongitude3">-111.221918716845</SimpleData>
-            <SimpleData name="GRingLongitude4">34.4674708800919</SimpleData>
-            <SimpleData name="GRingLatitude1">70.2079864935771</SimpleData>
-            <SimpleData name="GRingLatitude2">62.7754311452209</SimpleData>
-            <SimpleData name="GRingLatitude3">70.8825242775909</SimpleData>
-            <SimpleData name="GRingLatitude4">87.4924515566531</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -15.9419170954586,70.2079864935771,0
-                -67.9744935691197,62.7754311452209,0
-                -111.221918716845,70.8825242775909,0
-                34.4674708800919,87.4924515566531,0
-                -15.9419170954586,70.2079864935771,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.6">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.1725.061.2024090194903.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 17:25</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116571</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">180</SimpleData>
-            <SimpleData name="NorthBoundingCoord">89.9927310038755</SimpleData>
-            <SimpleData name="SouthBoundingCoord">65.8456576333237</SimpleData>
-            <SimpleData name="WestBoundingCoord">-180</SimpleData>
-            <SimpleData name="GRingLongitude1">-39.1071436304755</SimpleData>
-            <SimpleData name="GRingLongitude2">-100.448013016038</SimpleData>
-            <SimpleData name="GRingLongitude3">-149.768568474939</SimpleData>
-            <SimpleData name="GRingLongitude4">94.3776888156389</SimpleData>
-            <SimpleData name="GRingLatitude1">74.6259261567961</SimpleData>
-            <SimpleData name="GRingLatitude2">65.8411080096964</SimpleData>
-            <SimpleData name="GRingLatitude3">70.7145432149315</SimpleData>
-            <SimpleData name="GRingLatitude4">86.0945787713933</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -39.1071436304755,74.6259261567961,0
-                -100.448013016038,65.8411080096964,0
-                -149.768568474939,70.7145432149315,0
-                94.3776888156389,86.0945787713933,0
-                -39.1071436304755,74.6259261567961,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.7">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.1900.061.2024090212141.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 19:00</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116572</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-62.5015758680065</SimpleData>
-            <SimpleData name="NorthBoundingCoord">79.3377014225668</SimpleData>
-            <SimpleData name="SouthBoundingCoord">55.5538418462438</SimpleData>
-            <SimpleData name="WestBoundingCoord">-135.039741762909</SimpleData>
-            <SimpleData name="GRingLongitude1">-66.3487738950228</SimpleData>
-            <SimpleData name="GRingLongitude2">-106.026168333574</SimpleData>
-            <SimpleData name="GRingLongitude3">-135.417372982304</SimpleData>
-            <SimpleData name="GRingLongitude4">-62.2565178642346</SimpleData>
-            <SimpleData name="GRingLatitude1">61.209439509275</SimpleData>
-            <SimpleData name="GRingLatitude2">55.5495665020275</SimpleData>
-            <SimpleData name="GRingLatitude3">68.1919623414359</SimpleData>
-            <SimpleData name="GRingLatitude4">79.572915841341</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -66.3487738950228,61.209439509275,0
-                -106.026168333574,55.5495665020275,0
-                -135.417372982304,68.1919623414359,0
-                -62.2565178642346,79.572915841341,0
-                -66.3487738950228,61.209439509275,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.8">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.1905.061.2024090212502.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 19:05</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116572</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">180</SimpleData>
-            <SimpleData name="NorthBoundingCoord">89.995076263957</SimpleData>
-            <SimpleData name="SouthBoundingCoord">68.4082902506779</SimpleData>
-            <SimpleData name="WestBoundingCoord">-180</SimpleData>
-            <SimpleData name="GRingLongitude1">-60.5425849446779</SimpleData>
-            <SimpleData name="GRingLongitude2">-134.863891612061</SimpleData>
-            <SimpleData name="GRingLongitude3">172.578815273472</SimpleData>
-            <SimpleData name="GRingLongitude4">87.2646500758475</SimpleData>
-            <SimpleData name="GRingLatitude1">79.0016498580033</SimpleData>
-            <SimpleData name="GRingLatitude2">68.4068766513183</SimpleData>
-            <SimpleData name="GRingLatitude3">69.5413220529905</SimpleData>
-            <SimpleData name="GRingLatitude4">81.9910203157479</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -60.5425849446779,79.0016498580033,0
-                -134.863891612061,68.4068766513183,0
-                172.578815273472,69.5413220529905,0
-                87.2646500758475,81.9910203157479,0
-                -60.5425849446779,79.0016498580033,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.9">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.2040.061.2024090225420.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 20:40</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116573</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-79.9260946315299</SimpleData>
-            <SimpleData name="NorthBoundingCoord">83.7246855389902</SimpleData>
-            <SimpleData name="SouthBoundingCoord">59.2457540526085</SimpleData>
-            <SimpleData name="WestBoundingCoord">-171.313339728609</SimpleData>
-            <SimpleData name="GRingLongitude1">-90.7167961535511</SimpleData>
-            <SimpleData name="GRingLongitude2">-135.69240998768</SimpleData>
-            <SimpleData name="GRingLongitude3">-171.593375528892</SimpleData>
-            <SimpleData name="GRingLongitude4">-78.9318966408638</SimpleData>
-            <SimpleData name="GRingLatitude1">65.6564483346385</SimpleData>
-            <SimpleData name="GRingLatitude2">59.2409821468292</SimpleData>
-            <SimpleData name="GRingLatitude3">69.9594745209983</SimpleData>
-            <SimpleData name="GRingLatitude4">83.7836984958576</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -90.7167961535511,65.6564483346385,0
-                -135.69240998768,59.2409821468292,0
-                -171.593375528892,69.9594745209983,0
-                -78.9318966408638,83.7836984958576,0
-                -90.7167961535511,65.6564483346385,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.10">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.2220.061.2024091002722.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 22:20</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116574</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-73.594027898321</SimpleData>
-            <SimpleData name="NorthBoundingCoord">88.200703548274</SimpleData>
-            <SimpleData name="SouthBoundingCoord">62.6839118678724</SimpleData>
-            <SimpleData name="WestBoundingCoord">150.475831957974</SimpleData>
-            <SimpleData name="GRingLongitude1">-114.702508683396</SimpleData>
-            <SimpleData name="GRingLongitude2">-166.55054475789</SimpleData>
-            <SimpleData name="GRingLongitude3">150.396496093754</SimpleData>
-            <SimpleData name="GRingLongitude4">-66.5426294347686</SimpleData>
-            <SimpleData name="GRingLatitude1">70.0902403769178</SimpleData>
-            <SimpleData name="GRingLatitude2">62.6813214462699</SimpleData>
-            <SimpleData name="GRingLatitude3">70.863582195715</SimpleData>
-            <SimpleData name="GRingLatitude4">87.4276796575319</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -114.702508683396,70.0902403769178,0
-                -166.55054475789,62.6813214462699,0
-                150.396496093754,70.863582195715,0
-                -66.5426294347686,87.4276796575319,0
-                -114.702508683396,70.0902403769178,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
-      </Placemark>
-      <Placemark id="test_selectedmodis.11">
-        <ExtendedData>
-          <SchemaData schemaUrl="#test_selectedmodis.schema">
-            <SimpleData name="# GranuleID">MYD03.A2024090.2355.061.2024091020503.NRT.hdf</SimpleData>
-            <SimpleData name="StartDateTime">2024-03-30 23:55</SimpleData>
-            <SimpleData name="ArchiveSet">61</SimpleData>
-            <SimpleData name="OrbitNumber">116575</SimpleData>
-            <SimpleData name="DayNightFlag">D</SimpleData>
-            <SimpleData name="EastBoundingCoord">-139.286958113192</SimpleData>
-            <SimpleData name="NorthBoundingCoord">74.737022649142</SimpleData>
-            <SimpleData name="SouthBoundingCoord">51.6474215243887</SimpleData>
-            <SimpleData name="WestBoundingCoord">160.904901716861</SimpleData>
-            <SimpleData name="GRingLongitude1">-140.400489971112</SimpleData>
-            <SimpleData name="GRingLongitude2">-175.988794965225</SimpleData>
-            <SimpleData name="GRingLongitude3">160.475182503212</SimpleData>
-            <SimpleData name="GRingLongitude4">-139.230668162341</SimpleData>
-            <SimpleData name="GRingLatitude1">56.7178812627651</SimpleData>
-            <SimpleData name="GRingLatitude2">51.6409665155078</SimpleData>
-            <SimpleData name="GRingLatitude3">65.6012086891226</SimpleData>
-            <SimpleData name="GRingLatitude4">75.0361039848985</SimpleData>
-          </SchemaData>
-        </ExtendedData>
-        <Polygon>
-          <outerBoundaryIs>
-            <LinearRing>
-              <coordinates>
-                -140.400489971112,56.7178812627651,0
-                -175.988794965225,51.6409665155078,0
-                160.475182503212,65.6012086891226,0
-                -139.230668162341,75.0361039848985,0
-                -140.400489971112,56.7178812627651,0
-              </coordinates>
-            </LinearRing>
-          </outerBoundaryIs>
-        </Polygon>
       </Placemark>
     </Document>
   </Document>

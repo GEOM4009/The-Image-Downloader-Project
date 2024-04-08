@@ -23,6 +23,7 @@ from shapely.geometry import Polygon
 import fiona
 import shutil
 
+
 # Import KML driver for reading the KML file
 # $ I don't seem to have that driver and so I put LIBKML here
 fiona.supported_drivers["LIBKML"] = (
@@ -158,11 +159,6 @@ def extract_granule_id(metadata_file, kml_AOI_file, testmode):
 
     # Read the text file into a DataFrame skipping the first two rows as they are info
     df_txt = pd.read_csv(metadata_file, skiprows=2)
-
-    # Import KML driver for reading the KML file
-    # fiona.supported_drivers[
-    #    "KML"
-    # ] = "rw"  # $ you might want to put this line near the imports above the functions
 
     # Read the kml file and extract the aoi polygon
     poly_aoi = gpd.read_file(kml_AOI_file, driver="LIBKML", crs="EPSG:4326")
@@ -464,7 +460,7 @@ def merge_raster(band1, band2, band3, output_name):
 
 
 # Place Code here for GeoTIFF to KML conversion (Shea) ------------------------------
-def convert_to_kmz(input_tiff, output_kmz):
+def convert_to_kmz(input_tiff, output_kmz, gdal_translate_path):
     """
     This function converts a GeoTIFF file into a superoverlay kmz file.
 
@@ -484,10 +480,9 @@ def convert_to_kmz(input_tiff, output_kmz):
     """
 
     # 'gdal_translate' is a GDAL utility used to convert raster data between different formats, '-of' 'KMLSUPEROVERLAY' specify the output format
-    gdal_translate = "C:/Users/zachs/anaconda3/envs/geom4009/Library/bin/gdal_translate.exe"
 
     command = [
-        gdal_translate,
+        gdal_translate_path,
         "-of",
         "KMLSUPEROVERLAY",
         input_tiff,
@@ -588,18 +583,22 @@ def getconfig(cfg_path):
         parameter_file = config.get("Paths", "parameter_file")
         GeoTIFF_folder = config.get("Paths", "GeoTIFF_folder")
         TIFF_Final = config.get("Paths", "TIFF_Final")
+        gdal_translate_path = config.get("Paths", "gdal_translate_path")
+
         base_filenames = config.get("Names", "base_filenames")
+
         HEGTool_directory = config.get("HegTool", "HEGTool_directory")
         MRTBINDIR = config.get("HegTool", "MRTBINDIR")
         PGSHOME = config.get("HegTool", "PGSHOME")
         MRTDATADIR = config.get("HegTool", "MRTDATADIR")
+
         auth_token = config.get("LANCE", "auth_token")
         download_HDF_folder = config.get("LANCE", "download_HDF_folder")
         metadata_file = config.get("LANCE", "metadata_file")
         base_txt_url = config.get("LANCE", "base_txt_url")
         base_HDF_url = config.get("LANCE", "base_HDF_url")
         test_time = config.get("LANCE", "test_time")
-        gdal_translate_path = config.get("Paths", "gdal_translate_path")
+
         kml_AOI_file = config.get("BoundingBox", "kml_AOI_file")
         kmz_folder = config.get("Paths", "kmz_folder")
 
@@ -613,6 +612,7 @@ def getconfig(cfg_path):
         parameter_file,
         GeoTIFF_folder,
         TIFF_Final,
+        gdal_translate_path,
         base_filenames,
         HEGTool_directory,
         MRTBINDIR,
@@ -624,7 +624,6 @@ def getconfig(cfg_path):
         base_txt_url,
         base_HDF_url,
         test_time,
-        gdal_translate_path,
         kml_AOI_file,
         kmz_folder,
     )
@@ -647,6 +646,7 @@ def main():
         parameter_file,
         GeoTIFF_folder,
         TIFF_Final,
+        gdal_translate_path,
         base_filenames,
         HEGTool_directory,
         MRTBINDIR,
@@ -659,7 +659,6 @@ def main():
         base_HDF_url,
         test_time,
         kml_AOI_file,
-        gdal_translate_path,
         kmz_folder,
     ) = getconfig(configfile)
 
@@ -801,24 +800,37 @@ def main():
     output_kmz = os.path.join(kmz_folder, f"{formatted_datetime}_aqua.kml")
 
     convert_to_kmz(output_GeoTIFF_combined, output_kmz, gdal_translate_path)
+    # Removing unnecessary folders that got created during the conversion to kmz
+    shutil.rmtree("0")
+    shutil.rmtree("1")
+    shutil.rmtree("2")
+    shutil.rmtree("3")
     os.chdir("..")
-
-    shutil.make_archive(
-        f"{formatted_datetime}_aqua.kmz", "zip", root_dir="tmp", base_dir=None
-    )
-    shutil.move(
-        f"{formatted_datetime}_aqua.kmz.zip", f"{formatted_datetime}_aqua.kmz"
-    )
 
     # $ after you convert to kml you could zip the files in to a kmz, then there would be no conflict between
     # $ the subdirectories here...
-
+    # Uncommnet this section if you want to delete all the extra files
+    """
     # $ Clean up temporary files  - uncomment this when you are ready to deploy the code
-    os.remove(tifbands[0])
-    os.remove(tifbands[1])
-    os.remove(tifbands[2])
+    os.chdir(GeoTIFF_folder)
+    
+    # Get a list of all files and subdirectories in the folder
+    folder_contents = os.listdir(GeoTIFF_folder)
+
+    # Loop through the contents and remove files
+    for item in folder_contents:
+        item_path = os.path.join(GeoTIFF_folder, item)
+        if os.path.isfile(item_path):
+            os.remove(item_path)
+        elif os.path.isdir(item_path):
+            shutil.rmtree(item_path)
+
+    os.chdir("..")
     shutil.rmtree("tmp")
+    os.chdir(TIFF_Final)
     os.remove(output_GeoTIFF_combined)
+    os.chdir("..")
+    """
     # $ can clean up old hdf files too...
 
 
