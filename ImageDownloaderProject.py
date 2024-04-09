@@ -798,14 +798,32 @@ def main():
 
     # Name the output kml file path
     output_kmz = os.path.join(kmz_folder, f"{formatted_datetime}_aqua.kml")
-
+    # Convert the GeoTIFF into a kml
     convert_to_kmz(output_GeoTIFF_combined, output_kmz, gdal_translate_path)
+
+    os.chdir("..")
+    # zip the kml
+    shutil.make_archive(
+        f"{formatted_datetime}_aqua.kmz", "zip", root_dir="KMZ", base_dir=None
+    )
+    # convert the zipped kml into a kmz
+    shutil.move(
+        f"{formatted_datetime}_aqua.kmz.zip", f"{formatted_datetime}_aqua.kmz"
+    )
+    # move the kmz into the KMZ folder
+    shutil.move(
+        f"{formatted_datetime}_aqua.kmz",
+        os.path.join(kmz_folder, f"{formatted_datetime}_aqua.kmz"),
+    )
+    # Remove the kml file
+    os.remove(output_kmz)
+
     # Removing unnecessary folders that got created during the conversion to kmz
+    os.chdir(kmz_folder)
     shutil.rmtree("0")
     shutil.rmtree("1")
     shutil.rmtree("2")
     shutil.rmtree("3")
-    os.chdir("..")
 
     # $ after you convert to kml you could zip the files in to a kmz, then there would be no conflict between
     # $ the subdirectories here...

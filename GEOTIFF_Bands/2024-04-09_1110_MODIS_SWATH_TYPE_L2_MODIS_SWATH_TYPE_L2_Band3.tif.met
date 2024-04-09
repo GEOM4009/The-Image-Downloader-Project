@@ -25,7 +25,7 @@ GROUP                  = INVENTORYMETADATA
 
     OBJECT                 = PRODUCTIONDATETIME
       NUM_VAL              = 1
-      VALUE                = "2024-04-09T14:53:18.000Z"
+      VALUE                = "2024-04-09T15:41:18.000Z"
     END_OBJECT             = PRODUCTIONDATETIME
 
   END_GROUP              = ECSDATAGRANULE
