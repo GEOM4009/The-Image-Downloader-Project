@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>scripts package &#8212; Image Downloader Project 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=8d563738"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="scripts-package">
+<h1>scripts package<a class="headerlink" href="#scripts-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-scripts.ImageDownloaderProject">
+<span id="scripts-imagedownloaderproject-module"></span><h2>scripts.ImageDownloaderProject module<a class="headerlink" href="#module-scripts.ImageDownloaderProject" title="Link to this heading">¶</a></h2>
+<p>Created on Fri Mar 12 11:42:00 2024</p>
+<p>&#64;author: Philip, Shea, Collin and Zacharie</p>
+<p># $ need a proper docstring for the file</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.add_datetime_to_filenames">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">add_datetime_to_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GeoTIFF_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_filenames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatted_datetime</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#add_datetime_to_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.add_datetime_to_filenames" title="Link to this definition">¶</a></dt>
+<dd><p>This function builds the final GeoTIFF file names to place in the HEGTool
+parameter file based off of designated GeoTIFF folder, base name and date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>GeoTIFF_folder</strong><span class="classifier">STRING</span></dt><dd><p>GeoTIFF folder path.</p>
+</dd>
+<dt><strong>base_filenames</strong><span class="classifier">LIST</span></dt><dd><p>List of the 3 bands file names.</p>
+</dd>
+<dt><strong>formatted_datetime</strong><span class="classifier">datetime object</span></dt><dd><p>The formatted datetime taken from extract_date_from_filename function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>new_filenames</strong><span class="classifier">LIST</span></dt><dd><p>A list containing the final 3 GeoTIFF names with dates added for the parameter file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.convert_to_kmz">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">convert_to_kmz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_tiff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_kmz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdal_translate_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#convert_to_kmz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.convert_to_kmz" title="Link to this definition">¶</a></dt>
+<dd><p>This function converts a GeoTIFF file into a superoverlay kmz file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>input_tiff</strong><span class="classifier">STRING</span></dt><dd><p>GeoTIFF file path.</p>
+</dd>
+<dt><strong>output_kmz</strong><span class="classifier">STRING</span></dt><dd><p>KMZ file path.</p>
+</dd>
+<dt><strong>gdal_translate_path</strong><span class="classifier">STRING</span></dt><dd><p>Path to the computers gdal_translate.exe.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.convert_windows_to_unix_line_endings">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">convert_windows_to_unix_line_endings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#convert_windows_to_unix_line_endings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.convert_windows_to_unix_line_endings" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes the entire parameter file txt and converts it into
+the proper Unix (LF) that it need to be in for the HegTool to run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>parameter_file</strong><span class="classifier">STRING</span></dt><dd><p>Parameter file path.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.download_HDF_file">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">download_HDF_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_HDF_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_HDF_folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#download_HDF_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.download_HDF_file" title="Link to this definition">¶</a></dt>
+<dd><p>This function runs the command line request to download the HDF file
+from MODIS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>base_HDF_url</strong><span class="classifier">STRING</span></dt><dd><p>The base url for the HDF request.</p>
+</dd>
+<dt><strong>auth_token</strong><span class="classifier">STRING</span></dt><dd><p>Your MODIS authentication token.</p>
+</dd>
+<dt><strong>download_HDF_folder</strong><span class="classifier">STRING</span></dt><dd><p>The path to your designated folder for the HDF files.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd><p>Runs the command line request then returns if the download succeded or not.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.download_txt_file">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">download_txt_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_txt_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#download_txt_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.download_txt_file" title="Link to this definition">¶</a></dt>
+<dd><p>This function runs the command line request to download the txt metadata
+file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>base_txt_url</strong><span class="classifier">STRING</span></dt><dd><p>base url for metadata download.</p>
+</dd>
+<dt><strong>auth_token</strong><span class="classifier">STRING</span></dt><dd><p>Your MODIS authentication token.</p>
+</dd>
+<dt><strong>metadata_file</strong><span class="classifier">STRING</span></dt><dd><p>The path and new name to your designated folder for the TXT file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.extract_date_from_filename">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">extract_date_from_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#extract_date_from_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.extract_date_from_filename" title="Link to this definition">¶</a></dt>
+<dd><p>This function read the date time from the HDF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>hdf_filename</strong><span class="classifier">STRING</span></dt><dd><p>HDF file name.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>hdf_date</strong><span class="classifier">datetime object</span></dt><dd><p>Formated date time of the HDF file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.extract_granule_id">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">extract_granule_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kml_AOI_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testmode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#extract_granule_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.extract_granule_id" title="Link to this definition">¶</a></dt>
+<dd><p>This function extracts the granule id from the metadata file. It also extracts
+the bounding box coordinates for the HegTool
+It includes a test mode that will designate a specific test time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>metadata_file</strong><span class="classifier">STRING</span></dt><dd><p>Metadata file path.</p>
+</dd>
+<dt><strong>kml_file</strong><span class="classifier">STRING</span></dt><dd><p>KML file path.</p>
+</dd>
+<dt><strong>testmode</strong><span class="classifier">STRING</span></dt><dd><p>A specific date and time to run the function in test mode.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>TYPE</dt><dd><p>DESCRIPTION.</p>
+</dd>
+<dt>granule_id: STRING</dt><dd><p>Granule ID.</p>
+</dd>
+<dt><strong>upper_left</strong><span class="classifier">STRING</span></dt><dd><p>The upper left coordinates in the proper format for the Bounding box.</p>
+</dd>
+<dt><strong>lower_right</strong><span class="classifier">STRING</span></dt><dd><p>The lower right coordinates in the proper format for the Bounding box.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.getargs">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">getargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#getargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.getargs" title="Link to this definition">¶</a></dt>
+<dd><p>This function retrieves the configuration file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cfg_path</strong><span class="classifier">STRING</span></dt><dd><p>Configuration file path.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.getconfig">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">getconfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#getconfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.getconfig" title="Link to this definition">¶</a></dt>
+<dd><p>This function retrieves the information from the config file and places it into variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cfg_path</strong><span class="classifier">STRING</span></dt><dd><p>Configuration file path.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>TYPE</dt><dd><p>DESCRIPTION.</p>
+</dd>
+<dt><strong>GeoTIFF_folder</strong><span class="classifier">STRING</span></dt><dd><p>GeoTIFF folder path.</p>
+</dd>
+<dt><strong>TIFF_Final</strong><span class="classifier">STRING</span></dt><dd><p>Final merged GeoTIFF file path.</p>
+</dd>
+<dt><strong>base_filenames</strong><span class="classifier">LIST</span></dt><dd><p>List of 3 base file names.</p>
+</dd>
+<dt><strong>HEGTool_directory</strong><span class="classifier">STRING</span></dt><dd><p>Required HEGTool directory path.</p>
+</dd>
+<dt><strong>MRTBINDIR</strong><span class="classifier">STRING</span></dt><dd><p>Required HEGTool computer environment path.</p>
+</dd>
+<dt><strong>PGSHOME</strong><span class="classifier">STRING</span></dt><dd><p>Required HEGTool computer environment path.</p>
+</dd>
+<dt><strong>MRTDATADIR</strong><span class="classifier">STRING</span></dt><dd><p>Required HEGTool computer environment path.</p>
+</dd>
+<dt><strong>auth_token</strong><span class="classifier">STRING</span></dt><dd><p>Required HEGTool NASA Authentication Token.</p>
+</dd>
+<dt><strong>download_HDF_folder</strong><span class="classifier">STRING</span></dt><dd><p>HDF download folder path.</p>
+</dd>
+<dt><strong>metadata_file</strong><span class="classifier">STRING</span></dt><dd><p>Metadata file path.</p>
+</dd>
+<dt><strong>base_txt_url</strong><span class="classifier">STRING</span></dt><dd><p>Base url for the txt download for MODIS.</p>
+</dd>
+<dt><strong>base_HDF_url</strong><span class="classifier">STRING</span></dt><dd><p>Base url for the HDF download for MODIS.</p>
+</dd>
+<dt><strong>test_time</strong><span class="classifier">STRING</span></dt><dd><p>Date and time for test mode.</p>
+</dd>
+<dt><strong>gdal_translate_path</strong><span class="classifier">STRING</span></dt><dd><p>gdal translate exe path on computer.</p>
+</dd>
+<dt><strong>kml_AOI_file</strong><span class="classifier">STRING</span></dt><dd><p>KML Area of Interest file path.</p>
+</dd>
+<dt><strong>kmz_folder</strong><span class="classifier">STRING</span></dt><dd><p>KMZ output folder path.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.main" title="Link to this definition">¶</a></dt>
+<dd><p>This ks the main function that runs the script.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.merge_raster">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">merge_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#merge_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.merge_raster" title="Link to this definition">¶</a></dt>
+<dd><p>This functions takes 3 bands and merges them together in one GeoTIFF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>band1</strong><span class="classifier">STRING</span></dt><dd><p>Band 1 GeoTIFF file path.</p>
+</dd>
+<dt><strong>band2</strong><span class="classifier">STRING</span></dt><dd><p>Band 2 GeoTIFF file path.</p>
+</dd>
+<dt><strong>band3</strong><span class="classifier">STRING</span></dt><dd><p>Band 3 GeoTIFF file path.</p>
+</dd>
+<dt><strong>output_name</strong><span class="classifier">STRING</span></dt><dd><p>Final combined GeoTIFF file path with name.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ImageDownloaderProject.modify_parameter_file">
+<span class="sig-prename descclassname"><span class="pre">scripts.ImageDownloaderProject.</span></span><span class="sig-name descname"><span class="pre">modify_parameter_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HDF_input_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GeoTIFF_output_filenames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ul_corner_coordinates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_corner_coordinates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ImageDownloaderProject.html#modify_parameter_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ImageDownloaderProject.modify_parameter_file" title="Link to this definition">¶</a></dt>
+<dd><p>This function goes in and modifies the inputted parameter file to change
+the HDF_input_filename, GEOTIFF_output_filenames, the ul_corner_coordinates and the
+lr_corner_coordinates. This is to adjust the HEGTool parameters to take in the
+proper files and bounding boxes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>parameter_file</strong><span class="classifier">STRING</span></dt><dd><p>Parameter file path.</p>
+</dd>
+<dt><strong>HDF_input_filename</strong><span class="classifier">STRING</span></dt><dd><p>HDF file path.</p>
+</dd>
+<dt><strong>GeoTIFF_output_filenames</strong><span class="classifier">LIST</span></dt><dd><p>A list containing the 3 GeoTIFF output names.</p>
+</dd>
+<dt><strong>ul_corner_coordinates</strong><span class="classifier">STRING</span></dt><dd><p>Upper left bounding box coordinates.</p>
+</dd>
+<dt><strong>lr_corner_coordinates</strong><span class="classifier">TYPE</span></dt><dd><p>Lower right bounding box coordinates.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-scripts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-scripts" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Image Downloader Project</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zacharie Sauve, Collin Godsell, Philip Ishola, Shea Timmins.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/scripts.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

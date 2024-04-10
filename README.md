@@ -25,7 +25,14 @@ Before you begin, ensure you have met the following requirements:
 ### Set-up Configuration File
 1. Open config file 
 2. Update all necessary paths to reflect your operating system paths
-3. See config file for blank paths (to be filled). 
+3. See config file for *** paths (to be filled). 
+
+### Workflow Set-up
+1. Install all dependencie programs
+2. Create Area of Interest KML file
+3. Set-up Configuration File
+4. Create Task in Task Manager (see Task Scheduler Demo.docx in Installation Guide folder)
+5. Run Task Scheduler
 
 ### Troubleshooting
 If you encounter issues, please refer to the Imager Download Project Git Hub for troubleshooting. 

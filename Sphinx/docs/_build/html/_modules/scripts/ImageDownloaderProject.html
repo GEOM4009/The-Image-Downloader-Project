@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>scripts.ImageDownloaderProject &#8212; Image Downloader Project 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for scripts.ImageDownloaderProject</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Mar 12 11:42:00 2024</span>
+
+<span class="sd">@author: Philip, Shea, Collin and Zacharie</span>
+
+<span class="sd"># $ need a proper docstring for the file</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># import dependencies</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">rasterio.enums</span> <span class="kn">import</span> <span class="n">ColorInterp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">RawConfigParser</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+
+<span class="c1"># Import KML driver for reading the KML file</span>
+<span class="c1"># $ I don&#39;t seem to have that driver and so I put LIBKML here</span>
+<span class="n">fiona</span><span class="o">.</span><span class="n">supported_drivers</span><span class="p">[</span><span class="s2">&quot;LIBKML&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;rw&quot;</span>  <span class="c1"># $ you might want to put this line near the imports above the functions</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="download_txt_file">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.download_txt_file">[docs]</a>
+<span class="k">def</span> <span class="nf">download_txt_file</span><span class="p">(</span><span class="n">base_txt_url</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">,</span> <span class="n">metadata_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function runs the command line request to download the txt metadata</span>
+<span class="sd">    file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_txt_url : STRING</span>
+<span class="sd">        base url for metadata download.</span>
+<span class="sd">    auth_token : STRING</span>
+<span class="sd">        Your MODIS authentication token.</span>
+<span class="sd">    metadata_file : STRING</span>
+<span class="sd">        The path and new name to your designated folder for the TXT file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;wget&quot;</span><span class="p">,</span>
+        <span class="n">base_txt_url</span><span class="p">,</span>
+        <span class="s2">&quot;--header&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;Authorization: Bearer </span><span class="si">{</span><span class="n">auth_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="c1"># $ changed the quoting behaviour for shell=False</span>
+        <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+        <span class="n">metadata_file</span><span class="p">,</span>  <span class="c1"># This variable is a file not a dir so maybe rename it?</span>
+    <span class="p">]</span>
+    <span class="c1"># $ check that the words Authorization Bearer: is not in there x2 by removing that in config file</span>
+    <span class="c1"># $ I got a missing url error, check that there is no problem with quotes.</span>
+    <span class="c1"># $ also I am running on linux so my behaviour is different from yours I think.  https://stackoverflow.com/questions/15109665/subprocess-call-using-string-vs-using-list</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Execute the wget command</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>  <span class="c1"># $ Derek changed this to shell=False, see stack overflow above</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TXT file downloaded successfully.&quot;</span><span class="p">)</span>  <span class="c1"># $ this is not an HDF File</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle error if the command fails</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error downloading HDF file:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># New API download from LANCE NRT with token access (Zacharie)</span>
+<div class="viewcode-block" id="download_HDF_file">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.download_HDF_file">[docs]</a>
+<span class="k">def</span> <span class="nf">download_HDF_file</span><span class="p">(</span><span class="n">base_HDF_url</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">,</span> <span class="n">download_HDF_folder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function runs the command line request to download the HDF file</span>
+<span class="sd">    from MODIS</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_HDF_url : STRING</span>
+<span class="sd">        The base url for the HDF request.</span>
+<span class="sd">    auth_token : STRING</span>
+<span class="sd">        Your MODIS authentication token.</span>
+<span class="sd">    download_HDF_folder : STRING</span>
+<span class="sd">        The path to your designated folder for the HDF files.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Runs the command line request then returns if the download succeded or not.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;wget&quot;</span><span class="p">,</span>
+        <span class="n">base_HDF_url</span><span class="p">,</span>
+        <span class="s2">&quot;--header&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;Authorization: Bearer </span><span class="si">{</span><span class="n">auth_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="c1"># $ changed the quoting behaviour for shell=False</span>
+        <span class="s2">&quot;-P&quot;</span><span class="p">,</span>
+        <span class="n">download_HDF_folder</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Execute the wget command</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>  <span class="c1"># $ Derek changed this to shell=False, see stack overflow above</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HDF file downloaded successfully.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;ok&quot;</span>
+        <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HDF file not found...  it may not be available yet...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;not found&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;HDF file download didn&#39;t work out... Try debugging the code&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;error&quot;</span>
+
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle error if the command fails</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error downloading HDF file:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Text file processing function--------- (Collin)</span>
+<div class="viewcode-block" id="extract_granule_id">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.extract_granule_id">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_granule_id</span><span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">kml_AOI_file</span><span class="p">,</span> <span class="n">testmode</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function extracts the granule id from the metadata file. It also extracts</span>
+<span class="sd">    the bounding box coordinates for the HegTool</span>
+<span class="sd">    It includes a test mode that will designate a specific test time.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata_file : STRING</span>
+<span class="sd">        Metadata file path.</span>
+<span class="sd">    kml_file : STRING</span>
+<span class="sd">        KML file path.</span>
+<span class="sd">    testmode : STRING</span>
+<span class="sd">        A specific date and time to run the function in test mode.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TYPE</span>
+<span class="sd">        DESCRIPTION.</span>
+<span class="sd">    granule_id: STRING</span>
+<span class="sd">        Granule ID.</span>
+<span class="sd">    upper_left : STRING</span>
+<span class="sd">        The upper left coordinates in the proper format for the Bounding box.</span>
+<span class="sd">    lower_right : STRING</span>
+<span class="sd">        The lower right coordinates in the proper format for the Bounding box.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Read the text file into a DataFrame skipping the first two rows as they are info</span>
+    <span class="n">df_txt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Read the kml file and extract the aoi polygon</span>
+    <span class="n">poly_aoi</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">kml_AOI_file</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;LIBKML&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Extract geometry of the AOI</span>
+    <span class="n">aoi_geometry</span> <span class="o">=</span> <span class="n">poly_aoi</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Extract upper left and lower right coordinates and put it into the HEG readable format</span>
+    <span class="p">(</span>
+        <span class="n">xmin</span><span class="p">,</span>
+        <span class="n">ymin</span><span class="p">,</span>
+        <span class="n">xmax</span><span class="p">,</span>
+        <span class="n">ymax</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">aoi_geometry</span><span class="o">.</span><span class="n">bounds</span>
+    <span class="p">)</span>  <span class="c1"># .bounds gets the minumum bounding box (so the xmin, ymax, xmax, ymin) coordinates</span>
+
+    <span class="n">upper_left</span> <span class="o">=</span> <span class="s2">&quot;( &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ymax</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xmin</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; )&quot;</span>
+    <span class="n">lower_right</span> <span class="o">=</span> <span class="s2">&quot;( &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ymin</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xmax</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; )&quot;</span>
+
+    <span class="c1"># Convert bounding coordinates to Polygon geometries to display where the imagery is</span>
+    <span class="c1"># $ just so you know, this doesn&#39;t work for images crossing -180degs.  You might filter them out</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Polygon</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLongitude1&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLatitude1&quot;</span><span class="p">]),</span>
+                <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLongitude2&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLatitude2&quot;</span><span class="p">]),</span>
+                <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLongitude3&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLatitude3&quot;</span><span class="p">]),</span>
+                <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLongitude4&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;GRingLatitude4&quot;</span><span class="p">]),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_txt</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create a GeoDataFrame to house the entries</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df_txt</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+    <span class="c1"># $ this will export the df:</span>
+    <span class="c1"># gdf.to_file(&quot;test_allmodis.kml&quot;, driver=&quot;KML&quot;)</span>
+    <span class="c1"># Filter based on AOI polygon kml</span>
+    <span class="c1"># $ Should trap errors here if no modis images intersect!</span>
+    <span class="n">selected_granules</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">aoi_geometry</span><span class="p">)]</span>
+    <span class="c1"># $ remove night images</span>
+    <span class="n">selected_granules</span> <span class="o">=</span> <span class="n">selected_granules</span><span class="p">[</span>
+        <span class="n">selected_granules</span><span class="o">.</span><span class="n">DayNightFlag</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span>
+    <span class="p">]</span>
+    <span class="n">selected_granules</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># $ this will export the df:</span>
+    <span class="n">selected_granules</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;test_selectedmodis.kml&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;LIBKML&quot;</span><span class="p">)</span>
+    <span class="c1"># $ adding here for testmode</span>
+    <span class="k">if</span> <span class="n">testmode</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">selected_granule</span> <span class="o">=</span> <span class="n">selected_granules</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># $ test mode always gets the closest image in time to the time specified</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">testmode</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
+        <span class="c1"># $ should use loc instead..  come back to fix...</span>
+        <span class="n">selected_granules</span><span class="p">[</span><span class="s2">&quot;StartDateTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+            <span class="n">selected_granules</span><span class="p">[</span><span class="s2">&quot;StartDateTime&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">deltat</span> <span class="o">=</span> <span class="n">selected_granules</span><span class="p">[</span><span class="s2">&quot;StartDateTime&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span>
+        <span class="n">selected_granule</span> <span class="o">=</span> <span class="n">selected_granules</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">deltat</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()]</span>
+
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">selected_granule</span><span class="p">[</span><span class="s2">&quot;# GranuleID&quot;</span><span class="p">]),</span> <span class="n">upper_left</span><span class="p">,</span> <span class="n">lower_right</span></div>
+
+
+
+<span class="c1"># Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------</span>
+
+
+<span class="c1"># This section of the code was taken from and AI generated script to search the</span>
+<span class="c1"># hdf file for the time</span>
+<div class="viewcode-block" id="extract_date_from_filename">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.extract_date_from_filename">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_date_from_filename</span><span class="p">(</span><span class="n">hdf_filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function read the date time from the HDF file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hdf_filename : STRING</span>
+<span class="sd">        HDF file name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hdf_date : datetime object</span>
+<span class="sd">        Formated date time of the HDF file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">hdf_filename</span><span class="p">)[</span>
+        <span class="mi">7</span><span class="p">:</span><span class="mi">19</span>
+    <span class="p">]</span>  <span class="c1"># $ note that you can use position to get info too.</span>
+    <span class="n">hdf_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="s2">&quot;%Y%j.%H%M&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdf_date</span></div>
+
+
+
+<div class="viewcode-block" id="add_datetime_to_filenames">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.add_datetime_to_filenames">[docs]</a>
+<span class="k">def</span> <span class="nf">add_datetime_to_filenames</span><span class="p">(</span>
+    <span class="n">GeoTIFF_folder</span><span class="p">,</span> <span class="n">base_filenames</span><span class="p">,</span> <span class="n">formatted_datetime</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function builds the final GeoTIFF file names to place in the HEGTool</span>
+<span class="sd">    parameter file based off of designated GeoTIFF folder, base name and date.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    GeoTIFF_folder : STRING</span>
+<span class="sd">        GeoTIFF folder path.</span>
+<span class="sd">    base_filenames : LIST</span>
+<span class="sd">        List of the 3 bands file names.</span>
+<span class="sd">    formatted_datetime : datetime object</span>
+<span class="sd">        The formatted datetime taken from extract_date_from_filename function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    new_filenames : LIST</span>
+<span class="sd">        A list containing the final 3 GeoTIFF names with dates added for the parameter file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new_filenames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">base_filenames</span><span class="p">:</span>
+        <span class="c1"># Split the file name and extension</span>
+        <span class="n">base_name</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="c1"># Create the new filename with datetime and the original extension</span>
+        <span class="n">new_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">GeoTIFF_folder</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_MODIS_SWATH_TYPE_L2_</span><span class="si">{</span><span class="n">base_name</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">new_filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_filename</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">new_filenames</span></div>
+
+
+
+<span class="c1"># Only changing the output file sequentially was taken from AI,and</span>
+<span class="c1"># https://www.geeksforgeeks.org/python-program-to-replace-specific-line-in-file/</span>
+<span class="c1"># I used this site to get started on how to modify lines of text</span>
+<div class="viewcode-block" id="modify_parameter_file">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.modify_parameter_file">[docs]</a>
+<span class="k">def</span> <span class="nf">modify_parameter_file</span><span class="p">(</span>
+    <span class="n">parameter_file</span><span class="p">,</span>
+    <span class="n">HDF_input_filename</span><span class="p">,</span>
+    <span class="n">GeoTIFF_output_filenames</span><span class="p">,</span>
+    <span class="n">ul_corner_coordinates</span><span class="p">,</span>
+    <span class="n">lr_corner_coordinates</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function goes in and modifies the inputted parameter file to change</span>
+<span class="sd">    the HDF_input_filename, GEOTIFF_output_filenames, the ul_corner_coordinates and the</span>
+<span class="sd">    lr_corner_coordinates. This is to adjust the HEGTool parameters to take in the</span>
+<span class="sd">    proper files and bounding boxes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameter_file : STRING</span>
+<span class="sd">        Parameter file path.</span>
+<span class="sd">    HDF_input_filename : STRING</span>
+<span class="sd">        HDF file path.</span>
+<span class="sd">    GeoTIFF_output_filenames : LIST</span>
+<span class="sd">        A list containing the 3 GeoTIFF output names.</span>
+<span class="sd">    ul_corner_coordinates : STRING</span>
+<span class="sd">        Upper left bounding box coordinates.</span>
+<span class="sd">    lr_corner_coordinates : TYPE</span>
+<span class="sd">        Lower right bounding box coordinates.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="n">modified_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;INPUT_FILENAME&quot;</span><span class="p">):</span>
+            <span class="n">modified_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INPUT_FILENAME = </span><span class="si">{</span><span class="n">HDF_input_filename</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;OUTPUT_FILENAME&quot;</span><span class="p">):</span>
+            <span class="n">modified_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;OUTPUT_FILENAME = </span><span class="si">{</span><span class="n">GeoTIFF_output_filenames</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;SPATIAL_SUBSET_UL_CORNER&quot;</span><span class="p">):</span>
+            <span class="n">modified_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;SPATIAL_SUBSET_UL_CORNER = </span><span class="si">{</span><span class="n">ul_corner_coordinates</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;SPATIAL_SUBSET_LR_CORNER&quot;</span><span class="p">):</span>
+            <span class="n">modified_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;SPATIAL_SUBSET_LR_CORNER = </span><span class="si">{</span><span class="n">lr_corner_coordinates</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modified_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">modified_lines</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The parameter file has been modified&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># I found out that the file was in Windows CR LF not in Unix LF</span>
+<span class="c1"># https://stackoverflow.com/questions/36422107/how-to-convert-crlf-to-lf-on-a-windows-machine-in-python</span>
+<div class="viewcode-block" id="convert_windows_to_unix_line_endings">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.convert_windows_to_unix_line_endings">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_windows_to_unix_line_endings</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes the entire parameter file txt and converts it into</span>
+<span class="sd">    the proper Unix (LF) that it need to be in for the HegTool to run</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameter_file : STRING</span>
+<span class="sd">        Parameter file path.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">WINDOWS_LINE_ENDING</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+    <span class="n">UNIX_LINE_ENDING</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">open_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">WINDOWS_LINE_ENDING</span><span class="p">,</span> <span class="n">UNIX_LINE_ENDING</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+            <span class="n">open_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Line endings converted from Windows (CRLF) to Unix (LF) in </span><span class="si">{</span><span class="n">parameter_file</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Unable to open or modify file </span><span class="si">{</span><span class="n">parameter_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Place Code here for GeoTIFF merge (Philip) -------------------------------------------</span>
+<span class="c1"># Resources used: Code snippet provided by Derek, AI and https://rasterio.readthedocs.io/en/stable/topics/color.html</span>
+<div class="viewcode-block" id="merge_raster">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.merge_raster">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_raster</span><span class="p">(</span><span class="n">band1</span><span class="p">,</span> <span class="n">band2</span><span class="p">,</span> <span class="n">band3</span><span class="p">,</span> <span class="n">output_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This functions takes 3 bands and merges them together in one GeoTIFF file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    band1 : STRING</span>
+<span class="sd">        Band 1 GeoTIFF file path.</span>
+<span class="sd">    band2 : STRING</span>
+<span class="sd">        Band 2 GeoTIFF file path.</span>
+<span class="sd">    band3 : STRING</span>
+<span class="sd">        Band 3 GeoTIFF file path.</span>
+<span class="sd">    output_name : STRING</span>
+<span class="sd">        Final combined GeoTIFF file path with name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Open grayscale GeoTIFF files</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">band1</span><span class="p">)</span> <span class="k">as</span> <span class="n">src1</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+        <span class="n">band2</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">src2</span><span class="p">,</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">band3</span><span class="p">)</span> <span class="k">as</span> <span class="n">src3</span><span class="p">:</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">src1</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Read band 1</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="n">src2</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Read band 2</span>
+        <span class="n">b3</span> <span class="o">=</span> <span class="n">src3</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Read band 3</span>
+
+    <span class="c1"># Stack bands into an array</span>
+    <span class="n">b123</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># $ rescale the image to byte</span>
+    <span class="c1"># $ create a masked image that ignores the no data value</span>
+    <span class="c1"># https://stackoverflow.com/questions/49922460/scale-a-numpy-array-with-from-0-1-0-2-to-0-255</span>
+    <span class="n">b123masked</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_equal</span><span class="p">(</span>
+        <span class="n">b123</span><span class="p">,</span> <span class="o">-</span><span class="mi">28672</span>
+    <span class="p">)</span>  <span class="c1"># $ this is the no data value</span>
+    <span class="n">scaled</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">b123masked</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">b123masked</span><span class="p">))</span>
+        <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">b123masked</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">b123masked</span><span class="p">))</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="c1"># scaled = np.interp(b123masked, (np.min(b123masked), np.max(b123masked)), (0, 255)).astype(&quot;uint8&quot;)</span>
+    <span class="c1"># Get metadata from one of the input files</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">band1</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Update the band count to 3 for RGB</span>
+        <span class="c1"># $ if you want to do this you need to actually change the data from int16 to uint8, otherwise it won&#39;t work... Look up scale numpy array to 0-255</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span>
+        <span class="p">)</span>  <span class="c1"># Update the data type to ensure RGB interpretation</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">nodata</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Remove nodata value</span>
+
+    <span class="c1"># Write stacked RGB image to output file</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># Loop through each band</span>
+            <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="n">scaled</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>  <span class="c1"># Write each band with the correct index (starting from 1)</span>
+
+    <span class="c1"># # Update color interpretation of bands</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">colorinterp</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ColorInterp</span><span class="o">.</span><span class="n">red</span><span class="p">,</span>
+            <span class="n">ColorInterp</span><span class="o">.</span><span class="n">green</span><span class="p">,</span>
+            <span class="n">ColorInterp</span><span class="o">.</span><span class="n">blue</span><span class="p">,</span>
+        <span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RGB image saved as &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_name</span><span class="p">))</span></div>
+
+
+
+<span class="c1"># Place Code here for GeoTIFF to KML conversion (Shea) ------------------------------</span>
+<div class="viewcode-block" id="convert_to_kmz">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.convert_to_kmz">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_to_kmz</span><span class="p">(</span><span class="n">input_tiff</span><span class="p">,</span> <span class="n">output_kmz</span><span class="p">,</span> <span class="n">gdal_translate_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function converts a GeoTIFF file into a superoverlay kmz file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_tiff : STRING</span>
+<span class="sd">        GeoTIFF file path.</span>
+<span class="sd">    output_kmz : STRING</span>
+<span class="sd">        KMZ file path.</span>
+<span class="sd">    gdal_translate_path : STRING</span>
+<span class="sd">        Path to the computers gdal_translate.exe.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># &#39;gdal_translate&#39; is a GDAL utility used to convert raster data between different formats, &#39;-of&#39; &#39;KMLSUPEROVERLAY&#39; specify the output format</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">gdal_translate_path</span><span class="p">,</span>
+        <span class="s2">&quot;-of&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;KMLSUPEROVERLAY&quot;</span><span class="p">,</span>
+        <span class="n">input_tiff</span><span class="p">,</span>
+        <span class="n">output_kmz</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="c1"># Run the command</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Conversion to KMZ complete.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during conversion to KMZ: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Place Code to Read from config file (Zacharie) -------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="getargs">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.getargs">[docs]</a>
+<span class="k">def</span> <span class="nf">getargs</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function retrieves the configuration file path.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cfg_path : STRING</span>
+<span class="sd">        Configuration file path.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Process a file path.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># add an argument for configfile</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;configfile&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;enter the full path and name of your config file&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># now make a list of all the arguments</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">cfg_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">configfile</span>
+    <span class="k">return</span> <span class="n">cfg_path</span></div>
+
+
+
+<div class="viewcode-block" id="getconfig">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.getconfig">[docs]</a>
+<span class="k">def</span> <span class="nf">getconfig</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function retrieves the information from the config file and places it into variables</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cfg_path : STRING</span>
+<span class="sd">        Configuration file path.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TYPE</span>
+<span class="sd">        DESCRIPTION.</span>
+<span class="sd">    GeoTIFF_folder : STRING</span>
+<span class="sd">        GeoTIFF folder path.</span>
+<span class="sd">    TIFF_Final : STRING</span>
+<span class="sd">        Final merged GeoTIFF file path.</span>
+<span class="sd">    base_filenames : LIST</span>
+<span class="sd">        List of 3 base file names.</span>
+<span class="sd">    HEGTool_directory : STRING</span>
+<span class="sd">        Required HEGTool directory path.</span>
+<span class="sd">    MRTBINDIR : STRING</span>
+<span class="sd">        Required HEGTool computer environment path.</span>
+<span class="sd">    PGSHOME : STRING</span>
+<span class="sd">        Required HEGTool computer environment path.</span>
+<span class="sd">    MRTDATADIR : STRING</span>
+<span class="sd">        Required HEGTool computer environment path.</span>
+<span class="sd">    auth_token : STRING</span>
+<span class="sd">        Required HEGTool NASA Authentication Token.</span>
+<span class="sd">    download_HDF_folder : STRING</span>
+<span class="sd">        HDF download folder path.</span>
+<span class="sd">    metadata_file : STRING</span>
+<span class="sd">        Metadata file path.</span>
+<span class="sd">    base_txt_url : STRING</span>
+<span class="sd">        Base url for the txt download for MODIS.</span>
+<span class="sd">    base_HDF_url : STRING</span>
+<span class="sd">        Base url for the HDF download for MODIS.</span>
+<span class="sd">    test_time : STRING</span>
+<span class="sd">        Date and time for test mode.</span>
+<span class="sd">    gdal_translate_path : STRING</span>
+<span class="sd">        gdal translate exe path on computer.</span>
+<span class="sd">    kml_AOI_file : STRING</span>
+<span class="sd">        KML Area of Interest file path.</span>
+<span class="sd">    kmz_folder : STRING</span>
+<span class="sd">        KMZ output folder path.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">RawConfigParser</span><span class="p">()</span>  <span class="c1"># run the parser</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># read file</span>
+        <span class="c1"># now get the variables stored in the config file</span>
+        <span class="c1"># there are 4 categories - Paths, Name, HEGTool, BoundingBox</span>
+
+        <span class="n">parameter_file</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Paths&quot;</span><span class="p">,</span> <span class="s2">&quot;parameter_file&quot;</span><span class="p">)</span>
+        <span class="n">GeoTIFF_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Paths&quot;</span><span class="p">,</span> <span class="s2">&quot;GeoTIFF_folder&quot;</span><span class="p">)</span>
+        <span class="n">TIFF_Final</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Paths&quot;</span><span class="p">,</span> <span class="s2">&quot;TIFF_Final&quot;</span><span class="p">)</span>
+        <span class="n">gdal_translate_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Paths&quot;</span><span class="p">,</span> <span class="s2">&quot;gdal_translate_path&quot;</span><span class="p">)</span>
+
+        <span class="n">base_filenames</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Names&quot;</span><span class="p">,</span> <span class="s2">&quot;base_filenames&quot;</span><span class="p">)</span>
+
+        <span class="n">HEGTool_directory</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HegTool&quot;</span><span class="p">,</span> <span class="s2">&quot;HEGTool_directory&quot;</span><span class="p">)</span>
+        <span class="n">MRTBINDIR</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HegTool&quot;</span><span class="p">,</span> <span class="s2">&quot;MRTBINDIR&quot;</span><span class="p">)</span>
+        <span class="n">PGSHOME</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HegTool&quot;</span><span class="p">,</span> <span class="s2">&quot;PGSHOME&quot;</span><span class="p">)</span>
+        <span class="n">MRTDATADIR</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HegTool&quot;</span><span class="p">,</span> <span class="s2">&quot;MRTDATADIR&quot;</span><span class="p">)</span>
+
+        <span class="n">auth_token</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;auth_token&quot;</span><span class="p">)</span>
+        <span class="n">download_HDF_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;download_HDF_folder&quot;</span><span class="p">)</span>
+        <span class="n">metadata_file</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;metadata_file&quot;</span><span class="p">)</span>
+        <span class="n">base_txt_url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;base_txt_url&quot;</span><span class="p">)</span>
+        <span class="n">base_HDF_url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;base_HDF_url&quot;</span><span class="p">)</span>
+        <span class="n">test_time</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANCE&quot;</span><span class="p">,</span> <span class="s2">&quot;test_time&quot;</span><span class="p">)</span>
+
+        <span class="n">kml_AOI_file</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;BoundingBox&quot;</span><span class="p">,</span> <span class="s2">&quot;kml_AOI_file&quot;</span><span class="p">)</span>
+        <span class="n">kmz_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Paths&quot;</span><span class="p">,</span> <span class="s2">&quot;kmz_folder&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Trouble reading config file, please check the file and path are valid</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>  <span class="c1"># $ maybe a dictionary would be an easier way to gather this all together?</span>
+        <span class="n">parameter_file</span><span class="p">,</span>
+        <span class="n">GeoTIFF_folder</span><span class="p">,</span>
+        <span class="n">TIFF_Final</span><span class="p">,</span>
+        <span class="n">gdal_translate_path</span><span class="p">,</span>
+        <span class="n">base_filenames</span><span class="p">,</span>
+        <span class="n">HEGTool_directory</span><span class="p">,</span>
+        <span class="n">MRTBINDIR</span><span class="p">,</span>
+        <span class="n">PGSHOME</span><span class="p">,</span>
+        <span class="n">MRTDATADIR</span><span class="p">,</span>
+        <span class="n">auth_token</span><span class="p">,</span>
+        <span class="n">download_HDF_folder</span><span class="p">,</span>
+        <span class="n">metadata_file</span><span class="p">,</span>
+        <span class="n">base_txt_url</span><span class="p">,</span>
+        <span class="n">base_HDF_url</span><span class="p">,</span>
+        <span class="n">test_time</span><span class="p">,</span>
+        <span class="n">kml_AOI_file</span><span class="p">,</span>
+        <span class="n">kmz_folder</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../scripts.html#scripts.ImageDownloaderProject.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This ks the main function that runs the script.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get the config file name</span>
+    <span class="n">configfile</span> <span class="o">=</span> <span class="n">getargs</span><span class="p">()</span>
+    <span class="c1"># read in the config info</span>
+    <span class="p">(</span>
+        <span class="n">parameter_file</span><span class="p">,</span>
+        <span class="n">GeoTIFF_folder</span><span class="p">,</span>
+        <span class="n">TIFF_Final</span><span class="p">,</span>
+        <span class="n">gdal_translate_path</span><span class="p">,</span>
+        <span class="n">base_filenames</span><span class="p">,</span>
+        <span class="n">HEGTool_directory</span><span class="p">,</span>
+        <span class="n">MRTBINDIR</span><span class="p">,</span>
+        <span class="n">PGSHOME</span><span class="p">,</span>
+        <span class="n">MRTDATADIR</span><span class="p">,</span>
+        <span class="n">auth_token</span><span class="p">,</span>
+        <span class="n">download_HDF_folder</span><span class="p">,</span>
+        <span class="n">metadata_file</span><span class="p">,</span>
+        <span class="n">base_txt_url</span><span class="p">,</span>
+        <span class="n">base_HDF_url</span><span class="p">,</span>
+        <span class="n">test_time</span><span class="p">,</span>
+        <span class="n">kml_AOI_file</span><span class="p">,</span>
+        <span class="n">kmz_folder</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">getconfig</span><span class="p">(</span><span class="n">configfile</span><span class="p">)</span>
+
+    <span class="c1"># Split the string using a space delimiter (you can change this based on the actual delimiter)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># $ update this comment --&gt; there are no contestants here!</span>
+        <span class="c1"># need to parse out the names of the contestants</span>
+        <span class="c1"># first put each line in a list and remove spaces</span>
+        <span class="n">base_filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">base_filenames</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+        <span class="c1"># then remove empty rows</span>
+        <span class="n">base_filenames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">base_filenames</span>
+            <span class="k">for</span> <span class="n">base_filenames</span> <span class="ow">in</span> <span class="n">base_filenames</span>
+            <span class="k">if</span> <span class="n">base_filenames</span>
+        <span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">base_filenames</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There was an error in splitting the base file names&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get the date from today in UTC time to build the correct url for txt download</span>
+    <span class="c1"># $ I suggest you add a variable in the config file called testmode (or similar).</span>
+    <span class="c1"># $ if test mode is true, then it might override the t = now and put in a timestamp that would</span>
+    <span class="c1"># $ result in a given image, that way when you run the script it will give exactly the same kmz as</span>
+    <span class="c1"># $ you have in the test output file</span>
+
+    <span class="c1"># Get the current UTC date and time</span>
+    <span class="k">if</span> <span class="n">test_time</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">test_time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Format the date string for the text file name</span>
+    <span class="n">txt_file_name</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&quot;MYD03_%Y-%m-</span><span class="si">%d</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Construct the full URL for the text file download</span>
+    <span class="n">txt_url_full</span> <span class="o">=</span> <span class="n">base_txt_url</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&quot;%Y/&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">txt_file_name</span>
+
+    <span class="c1"># Download the txt file for that day</span>
+    <span class="n">download_txt_file</span><span class="p">(</span><span class="n">txt_url_full</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">,</span> <span class="n">metadata_file</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------&quot;</span><span class="p">)</span>
+
+    <span class="n">granule_id</span><span class="p">,</span> <span class="n">upper_left</span><span class="p">,</span> <span class="n">lower_right</span> <span class="o">=</span> <span class="n">extract_granule_id</span><span class="p">(</span>
+        <span class="n">metadata_file</span><span class="p">,</span> <span class="n">kml_AOI_file</span><span class="p">,</span> <span class="n">test_time</span>
+    <span class="p">)</span>
+
+    <span class="c1"># $ you must modfify granule_id to match the MYD09 filename you want:</span>
+    <span class="n">granule_id</span> <span class="o">=</span> <span class="n">granule_id</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;9&quot;</span> <span class="o">+</span> <span class="n">granule_id</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.061.NRT.hdf&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found matching MODIS image: </span><span class="si">{</span><span class="n">granule_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------&quot;</span><span class="p">)</span>
+
+    <span class="c1"># $ you need to replace the base_HDF_url in the config file with:</span>
+    <span class="c1"># $ base_HDF_url = https://nrt3.modaps.eosdis.nasa.gov/api/v2/content/archives/allData/61/MYD09/Recent</span>
+
+    <span class="c1"># $ here is the new wa</span>
+    <span class="n">hdf_url_full</span> <span class="o">=</span> <span class="n">base_HDF_url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">granule_id</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloding... </span><span class="si">{</span><span class="n">hdf_url_full</span><span class="si">}</span><span class="s2">....&quot;</span><span class="p">)</span>
+    <span class="c1"># This line downloads the hdf file with the full url with new hdf file name</span>
+    <span class="c1"># $ this line of code needs to be uncommented for the code to work!</span>
+    <span class="c1"># $ added a condition so you don&#39;t download the file more than once</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_HDF_folder</span><span class="p">,</span> <span class="n">granule_id</span><span class="p">)):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">download_HDF_file</span><span class="p">(</span><span class="n">hdf_url_full</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">,</span> <span class="n">download_HDF_folder</span><span class="p">)</span>
+
+        <span class="c1"># $ no sense going on without the image you need.</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="s2">&quot;ok&quot;</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">input_hdf_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_HDF_folder</span><span class="p">,</span> <span class="n">granule_id</span><span class="p">)</span>
+    <span class="c1"># Extract date from hdf file</span>
+    <span class="n">hdf_date</span> <span class="o">=</span> <span class="n">extract_date_from_filename</span><span class="p">(</span><span class="n">input_hdf_filename</span><span class="p">)</span>
+    <span class="c1"># $ note only date is retrieved, not time?!</span>
+    <span class="k">if</span> <span class="n">hdf_date</span><span class="p">:</span>
+        <span class="n">formatted_datetime</span> <span class="o">=</span> <span class="n">hdf_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+            <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H%M&quot;</span>
+        <span class="p">)</span>  <span class="c1"># $ replaced . with :</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracted Date from HDF Filename:&quot;</span><span class="p">,</span> <span class="n">formatted_datetime</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to extract date from HDF filename.&quot;</span><span class="p">)</span>
+
+    <span class="n">new_date_output_filenames</span> <span class="o">=</span> <span class="n">add_datetime_to_filenames</span><span class="p">(</span>
+        <span class="n">GeoTIFF_folder</span><span class="p">,</span> <span class="n">base_filenames</span><span class="p">,</span> <span class="n">formatted_datetime</span>
+    <span class="p">)</span>
+
+    <span class="c1"># $ copy the list above to a tuple because it gets modified by the function below</span>
+    <span class="n">tifbands</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_date_output_filenames</span><span class="p">)</span>
+
+    <span class="c1"># This section modifies the parameter file for the HEGTool to run</span>
+    <span class="n">modify_parameter_file</span><span class="p">(</span>
+        <span class="n">parameter_file</span><span class="p">,</span>
+        <span class="n">input_hdf_filename</span><span class="p">,</span>
+        <span class="n">new_date_output_filenames</span><span class="p">,</span>
+        <span class="n">upper_left</span><span class="p">,</span>  <span class="c1"># $ lat and lon reversed!</span>
+        <span class="n">lower_right</span><span class="p">,</span>  <span class="c1"># $ lat and lon reversed!</span>
+    <span class="p">)</span>
+    <span class="c1"># This makes sure that the file is still in the correct Unix LF format</span>
+    <span class="n">convert_windows_to_unix_line_endings</span><span class="p">(</span><span class="n">parameter_file</span><span class="p">)</span>
+
+    <span class="c1"># Set environment variables</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MRTBINDIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MRTBINDIR</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PGSHOME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PGSHOME</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MRTDATADIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MRTDATADIR</span>
+
+    <span class="c1"># Set the working directory</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">HEGTool_directory</span><span class="p">)</span>
+
+    <span class="c1"># Command to run HegTool with the parameter file</span>
+    <span class="c1"># https://www.hdfeos.org/software/heg.php</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;swtif&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+        <span class="n">parameter_file</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Execute the command</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HegTool executed successfully.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle error if the command fails</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error running HegTool:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="c1"># $ use values from config file and what you have done above!</span>
+    <span class="n">output_GeoTIFF_combined</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">TIFF_Final</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.tif&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">merge_raster</span><span class="p">(</span>
+        <span class="n">tifbands</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tifbands</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tifbands</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">output_GeoTIFF_combined</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Go into the kmz folder directory</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">kmz_folder</span><span class="p">)</span>
+
+    <span class="c1"># Name the output kml file path</span>
+    <span class="n">output_kmz</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kmz_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kml&quot;</span><span class="p">)</span>
+    <span class="c1"># Convert the GeoTIFF into a kml</span>
+    <span class="n">convert_to_kmz</span><span class="p">(</span><span class="n">output_GeoTIFF_combined</span><span class="p">,</span> <span class="n">output_kmz</span><span class="p">,</span> <span class="n">gdal_translate_path</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+    <span class="c1"># zip the kml</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kmz&quot;</span><span class="p">,</span> <span class="s2">&quot;zip&quot;</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="s2">&quot;KMZ&quot;</span><span class="p">,</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="c1"># convert the zipped kml into a kmz</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kmz.zip&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kmz&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># move the kmz into the KMZ folder</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kmz&quot;</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kmz_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">formatted_datetime</span><span class="si">}</span><span class="s2">_aqua.kmz&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="c1"># Remove the kml file</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_kmz</span><span class="p">)</span>
+
+    <span class="c1"># Removing unnecessary folders that got created during the conversion to kmz</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">kmz_folder</span><span class="p">)</span>
+
+    <span class="c1"># $ after you convert to kml you could zip the files in to a kmz, then there would be no conflict between</span>
+    <span class="c1"># $ the subdirectories here...</span>
+    <span class="c1"># Uncommnet this section if you want to delete all the extra files</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    os.chdir(GeoTIFF_folder)</span>
+<span class="sd">    </span>
+<span class="sd">    # Get a list of all files and subdirectories in the folder</span>
+<span class="sd">    folder_contents = os.listdir(GeoTIFF_folder)</span>
+
+<span class="sd">    # Loop through the contents and remove files</span>
+<span class="sd">    for item in folder_contents:</span>
+<span class="sd">        item_path = os.path.join(GeoTIFF_folder, item)</span>
+<span class="sd">        if os.path.isfile(item_path):</span>
+<span class="sd">            os.remove(item_path)</span>
+<span class="sd">        elif os.path.isdir(item_path):</span>
+<span class="sd">            shutil.rmtree(item_path)</span>
+
+<span class="sd">    os.chdir(&quot;..&quot;)</span>
+<span class="sd">    shutil.rmtree(&quot;tmp&quot;)</span>
+<span class="sd">    os.chdir(TIFF_Final)</span>
+<span class="sd">    os.remove(output_GeoTIFF_combined)</span>
+<span class="sd">    os.chdir(&quot;..&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+    <span class="c1"># $ can clean up old hdf files too...</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Image Downloader Project</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zacharie Sauve, Collin Godsell, Philip Ishola, Shea Timmins.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
