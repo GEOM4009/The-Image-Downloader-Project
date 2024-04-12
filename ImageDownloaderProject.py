@@ -25,7 +25,6 @@ import shutil
 
 
 # Import KML driver for reading the KML file
-# $ I don't seem to have that driver and so I put LIBKML here
 fiona.supported_drivers["LIBKML"] = (
     "rw"  # $ you might want to put this line near the imports above the functions
 )
@@ -59,22 +58,20 @@ def download_txt_file(base_txt_url, auth_token, metadata_file):
         "-O",
         metadata_file,  # This variable is a file not a dir so maybe rename it?
     ]
-    # $ check that the words Authorization Bearer: is not in there x2 by removing that in config file
-    # $ I got a missing url error, check that there is no problem with quotes.
-    # $ also I am running on linux so my behaviour is different from yours I think.  https://stackoverflow.com/questions/15109665/subprocess-call-using-string-vs-using-list
+
 
     try:
         # Execute the wget command
         subprocess.run(
             command, shell=False
         )  # $ Derek changed this to shell=False, see stack overflow above
-        print("TXT file downloaded successfully.")  # $ this is not an HDF File
+        print("TXT file downloaded successfully.") 
     except subprocess.CalledProcessError as e:
         # Handle error if the command fails
-        print("Error downloading HDF file:", e)
+        print("Error downloading TXT file:", e)
 
 
-# New API download from LANCE NRT with token access (Zacharie)
+# API download from LANCE NRT with token access (Zacharie)
 def download_HDF_file(base_HDF_url, auth_token, download_HDF_folder):
     """
     This function runs the command line request to download the HDF file
@@ -100,7 +97,7 @@ def download_HDF_file(base_HDF_url, auth_token, download_HDF_folder):
         "wget",
         base_HDF_url,
         "--header",
-        f"Authorization: Bearer {auth_token}",  # $ changed the quoting behaviour for shell=False
+        f"Authorization: Bearer {auth_token}", 
         "-P",
         download_HDF_folder,
     ]
@@ -195,8 +192,6 @@ def extract_granule_id(metadata_file, kml_AOI_file, testmode):
 
     # Create a GeoDataFrame to house the entries
     gdf = gpd.GeoDataFrame(df_txt, geometry=geometry, crs="EPSG:4326")
-    # $ this will export the df:
-    # gdf.to_file("test_allmodis.kml", driver="KML")
     # Filter based on AOI polygon kml
     # $ Should trap errors here if no modis images intersect!
     selected_granules = gdf[gdf.intersects(aoi_geometry)]
@@ -223,10 +218,10 @@ def extract_granule_id(metadata_file, kml_AOI_file, testmode):
     return str(selected_granule["# GranuleID"]), upper_left, lower_right
 
 
-# Place Code Here for HDF to GeoTIFF conversion (Zacharie)--------------------------------------
+# HDF to GeoTIFF conversion (Zacharie)--------------------------------------
 
 
-# This section of the code was taken from and AI generated script to search the
+# This section of the code was given by Derek
 # hdf file for the time
 def extract_date_from_filename(hdf_filename):
     """
@@ -391,7 +386,7 @@ def convert_windows_to_unix_line_endings(parameter_file):
 # Resources used: Code snippet provided by Derek, AI and https://rasterio.readthedocs.io/en/stable/topics/color.html
 def merge_raster(band1, band2, band3, output_name):
     """
-    This functions takes 3 bands and merges them together in one GeoTIFF file.
+    This functions takes 3 bands and merges them together in one GeoTIFF file. It does this by changing the data from int16 to uint8 and then scalling the 3 bands by weight.
 
     Parameters
     ----------
