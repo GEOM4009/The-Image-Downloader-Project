@@ -24,15 +24,24 @@ Before you begin, ensure you have met the following requirements:
 
 ### Set-up Configuration File
 1. Open config file in a text editor
-2. Update all necessary paths to reflect your operating system paths
+2. Update all necessary paths to reflect your operating system paths (Make sure all paths do not have spaces in the names as this will cause the HegTool not to work)
 3. See config file for *** paths (to be filled)
+4. Save the document
+
+### Set-up Batch File
+1. Open ImageDownloader.bat in a text editor
+2. Update first path to point to where your python.exe is located in the imagedownloader environment folder on your computer
+3. Update the second path to point to where the ImageDownloaderProject.py is located on your computer
+4. Update the third path to poin to where the config.cfg is located on your computer
+5. Save the document
 
 ### Workflow Set-up
 1. Install all dependencie programs
 2. Create Area of Interest KML file
 3. Set-up Configuration File
-4. Create Task in Task Manager (see Task Scheduler Demo in Installation Guide folder)
-5. Run Task Scheduler
+4. Set-up Batch File
+5. Create Task in Task Manager (see Task Scheduler Demo in Installation Guide folder)
+6. Run Task Scheduler
 
 ### Troubleshooting
 If you encounter issues, please refer to the Imager Download Project Git Hub for troubleshooting. 
